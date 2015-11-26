@@ -1,0 +1,19 @@
+## aide config for mhn server and nodes
+## server
+/var/lib/mongodb/mnemosyne.*$ VarFile
+/var/log/mhn$ VarDir
+## node
+!/opt/glastopf/data/dork_pages
+/opt/glastopf/db/glastopf.db$ VarFile
+/opt/glastopf/log/glastopf.log$ VarFile
+/tmp/update_maxmind.log$ VarFile
+/var/maxmind/GeoIP.dat.gz$ VarFile
+/var/maxmind/GeoIPASNum.dat.gz$ VarFile
+/var/maxmind/GeoIPASNumv6.dat.gz$ VarFile
+/var/maxmind/GeoIPv6.dat.gz$ VarFile
+/var/maxmind/GeoLiteCity.dat.gz$ VarFile
+/var/maxmind/GeoLiteCityv6.dat.gz$ VarFile
+/opt/bro/logs$ VarDir
+!/opt/bro/spool/tmp
+!/opt/bro/spool/bro
+!/opt/bro/logs

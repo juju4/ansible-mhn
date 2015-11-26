@@ -1,0 +1,59 @@
+
+# HTTPS server
+#
+server {
+	listen 443;
+    server_name  _;  
+	server_tokens off;
+
+	index index.html index.htm;
+
+	ssl on;
+	ssl_certificate /etc/ssl/{{ domain }}.crt;
+	ssl_certificate_key /etc/ssl/private/{{ domain }}.key;
+
+	ssl_session_timeout 5m;
+
+	ssl_protocols TLSv1.2;
+	ssl_ciphers "HIGH:!aNULL:!MD5 or HIGH:!aNULL:!MD5:!3DES";
+	ssl_prefer_server_ciphers on;
+
+	keepalive_timeout   70;
+
+    location = /favicon.ico {
+    	log_not_found off;
+    	access_log off;
+    }
+    
+    location = /robots.txt {
+    	allow all;
+    	log_not_found off;
+    	access_log off;
+    }
+    location ~* /\. {
+            deny all;
+    }
+    location ~* \.(inc|old|svn|git)$ {
+            deny all;
+    }
+    location ~* /(?:upload|files|pub)/.*\.php$ {
+            deny all;
+    }
+
+
+    location / { 
+        try_files \$uri @mhnserver; 
+#        auth_basic "Restricted access";
+#        auth_basic_user_file /var/www/html/.htpasswd;
+    }   
+    
+    root /opt/www;
+    location @mhnserver {
+      include uwsgi_params;
+      uwsgi_pass unix:/tmp/uwsgi.sock;
+    }   
+    location  /static {
+      alias {{ MHN_HOME }}/server/mhn/static;
+    }
+
+}

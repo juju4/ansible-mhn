@@ -1,0 +1,79 @@
+---
+- name: MHN Client | registration
+  include: registration.yml honeypot=kippo
+- set_fact:
+    deploy: /root/.registration_done-kippo
+
+- shell: "echo {{ server_url }} | sed 's#^http://##; s#^https://##; s#/.*$##; s/:.*$//'"
+  register: HPF_HOST
+  changed_when: False
+- set_fact:
+    HPF_PORT: 10000
+- shell: "python -c 'import json;obj=json.load(file(\"{{ deploy }}\"));print obj[\"identifier\"]'"
+  register: HPF_IDENT
+  changed_when: False
+- shell: "python -c 'import json;obj=json.load(file(\"{{ deploy }}\"));print obj[\"secret\"]'"
+  register: HPF_SECRET
+  changed_when: False
+
+- name: Ubuntu | Install mhnserver dependencies
+  apt: name={{item}} state=present update_cache=yes
+  with_items:
+    - python-dev
+    - openssl
+    - python-openssl
+    - python-pyasn1
+    - python-twisted
+    - git
+    - python-pip
+    - supervisor
+    - authbind
+    - iptables-persistent
+
+- name: Kippo | ensure no conflict with main ssh server = could break your config if using Vagrant
+  lineinfile:
+    "dest='/etc/ssh/sshd_config' regexp='^Port 22$' line='Port {{ real_ssh_port }}'"
+  notify:
+    - restart ssh
+  when: real_ssh_port is defined and real_ssh_port != 22
+
+- user: name=kippo shell=/bin/bash group=users home=/home/kippo
+
+- stat: path=/opt/kippo
+  register: kippodir
+- name: git clone kippo
+  git:
+    repo=https://github.com/threatstream/kippo
+    dest=/opt/kippo
+  when: not kippodir.stat.exists
+
+- name: Determine if IPTables forwarding is going to work
+  shell: sysctl -w net.ipv4.conf.eth0.route_localnet=1 2>&1 >/dev/null
+  register: sysctlout
+- set_fact:
+    iptable_support: true
+  changed_when: "sysctlout.rc != 0"
+- name: "Add iptables forwarding to kippo (iptables_support {{ iptables_support }})"
+  template: src=rules.v4 dest=/etc/iptables/rules.v4 mode=0644
+  when: iptables_support is defined and iptables_support
+- template: src=kippo.cfg dest=/opt/kippo/kippo.cfg mode=0644
+
+- name: Make directory owned by kippo user
+  file:
+    path: /opt/kippo
+    owner: kippo
+    group: users
+    recurse: yes
+
+- stat: path=/etc/authbind/byport/22
+  register: authbind
+- file: path=/etc/authbind/byport/22 state=touch mode=0777 owner=kippo
+  when: not authbind.stat.exists
+
+- template: src=start.sh dest=/opt/kippo/start.sh mode=0755
+
+- template: src=kippo.conf dest=/etc/supervisor/conf.d/kippo.conf mode=0644
+  notify:
+    - supervisor update
+
+

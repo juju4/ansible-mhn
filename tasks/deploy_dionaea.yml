@@ -1,0 +1,88 @@
+---
+- name: MHN Client | registration
+  include: registration.yml honeypot=dionaea
+- set_fact:
+    deploy: /root/.registration_done-dionaea
+
+- shell: "echo {{ server_url }} | sed 's#^http://##; s#^https://##; s#/.*$##; s/:.*$//'"
+  register: HPF_HOST
+  changed_when: False
+- set_fact:
+    HPF_PORT: 10000
+- shell: "python -c 'import json;obj=json.load(file(\"{{ deploy }}\"));print obj[\"identifier\"]'"
+  register: HPF_IDENT
+  changed_when: False
+- shell: "python -c 'import json;obj=json.load(file(\"{{ deploy }}\"));print obj[\"secret\"]'"
+  register: HPF_SECRET
+  changed_when: False
+
+- name: Ubuntu | Install dionaea dependencies
+  apt: name={{item}} state=present update_cache=yes
+  with_items:
+    - python-software-properties
+    - git
+    - supervisor
+    - patch
+
+- apt_repository: repo='ppa:honeynet/nightly'
+
+- name: Ubuntu | Install dionaea
+  apt: name={{item}} state=present update_cache=yes
+  with_items:
+    - dionaea-phibo
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'trusty'
+- name: Ubuntu | Install dionaea
+  apt: name={{item}} state=present update_cache=yes
+  with_items:
+    - dionaea
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_release != 'trusty'
+
+- template: src=dionaea.hpfeeds.patch dest=/tmp/dionaea.hpfeeds.patch mode=0644
+
+- copy: src=hpfeeds.py dest=/usr/lib/dionaea/python/dionaea/hpfeeds.py mode=0755
+
+- stat: path=/etc/dionaea/dionaea.conf.0
+  register: dbkp
+- command: "cp /etc/dionaea/dionaea.conf /etc/dionaea/dionaea.conf.0"
+  when: not dbkp.stat.exists
+- stat: path=/root/.dionaea_patch
+  register: dp
+## remote_src needed else doing from master: fatal: [node1] => input file not found at /tmp/dionaea.hpfeeds.patch or /tmp/dionaea.hpfeeds.patch
+- name: apply patch dionaea.hpfeeds.patch
+  patch: >
+    src=/tmp/dionaea.hpfeeds.patch
+    basedir=/
+    strip=0
+    remote_src=True
+  when: not dp.stat.exists
+- file: path=/root/.dionaea_patch state=touch
+  when: not dp.stat.exists
+
+- file: "path={{ item }} state=directory mode=0755"
+  with_items:
+    - /var/dionaea/wwwroot
+    - /var/dionaea/binaries
+    - /var/dionaea/log
+    - /var/dionaea/bistreams
+
+- name: Make directory owned by nobody user
+  file:
+    path: /var/dionaea
+    owner: nobody
+    group: nogroup
+    recurse: yes
+
+- replace: "dest=/etc/dionaea/dionaea.conf regexp='{{ item.regexp }}' replace='{{ item.replace }}' backup=yes"
+  with_items:
+## FIXME! not idempotent
+#    - { regexp: 'var/dionaea/', replace: '' }
+#    - { regexp: 'log/', replace: '/var/dionaea/log/' }
+    - { regexp: 'levels = "all"', replace: 'levels = "warning,error"' }
+    - { regexp: 'mode = "getifaddrs"', replace: 'mode = "manual"' }
+    - { regexp: 'addrs = { eth0 = \["::"\] }', replace: 'addrs = { eth0 = ["::", "0.0.0.0"] }' }
+
+- copy: src=dionaea.conf dest=/etc/supervisor/conf.d/dionaea.conf mode=0644
+  notify:
+    - supervisor update
+
+

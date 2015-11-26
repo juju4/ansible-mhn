@@ -1,0 +1,23 @@
+{
+    "HOST": "localhost",
+    "PORT": 10000,
+    "IDENT": "geoloc", 
+    "SECRET": "{{ SECRET }}",
+    "CHANNELS": [
+        "dionaea.connections",
+        "dionaea.capture",
+        "glastopf.events",
+        "beeswarm.hive",
+        "kippo.sessions",
+        "conpot.events",
+        "snort.alerts",
+        "amun.events",
+        "wordpot.events",
+        "shockpot.events",
+        "p0f.events",
+        "suricata.events",
+        "elastichoney.events"
+    ],
+    "GEOLOC_CHAN": "geoloc.events"
+}
+

@@ -1,0 +1,6 @@
+---
+## FIXME! not finished
+
+#- include: splunk_universalforwarder.yml
+- include: hpfeeds-logger-splunk.yml
+

@@ -1,0 +1,7 @@
+---
+- name: supervisor update
+  command: 'supervisorctl update'
+- name: nginx restart
+  service: name=nginx state=restarted
+- name: restart ssh
+  service: name=ssh state=restarted

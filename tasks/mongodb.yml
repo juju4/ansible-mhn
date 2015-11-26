@@ -1,0 +1,12 @@
+---
+- name: Ubuntu | Add Mongodb repository key
+  apt_key: keyserver=hkp://keyserver.ubuntu.com:80 id=7F0CEB10
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+- name: Ubuntu | Add Mongodb repository
+  apt_repository: repo='deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' state=present
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+- name: Ubuntu | Install mongodb
+  apt: name={{item}} state=present update_cache=yes
+  with_items:
+    - mongodb-org
+

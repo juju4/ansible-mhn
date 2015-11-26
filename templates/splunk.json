@@ -1,0 +1,25 @@
+## /opt/hpfeeds-logger/splunk.json
+{
+    "host": "localhost",
+    "port": 10000,
+    "ident": "{{ IDENT }}", 
+    "secret": "{{ SECRET.stdout }}",
+    "channels": [
+        "amun.events",
+        "dionaea.connections",
+        "dionaea.capture",
+        "glastopf.events",
+        "beeswarm.hive",
+        "kippo.sessions",
+        "conpot.events",
+        "snort.alerts",
+        "suricata.events",
+        "wordpot.events",
+        "shockpot.events",
+        "p0f.events",
+        "elastichoney.events"
+    ],
+    "log_file": "/var/log/mhn/mhn-splunk.log",
+    "formatter_name": "splunk"
+}
+

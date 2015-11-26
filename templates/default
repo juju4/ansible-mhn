@@ -1,0 +1,19 @@
+## /etc/nginx/sites-available/default
+server {
+    listen       80;
+    server_name  _;
+    
+    location / { 
+        try_files \$uri @mhnserver; 
+    }
+    
+    root /opt/www;
+    location @mhnserver {
+      include uwsgi_params;
+      uwsgi_pass unix:/tmp/uwsgi.sock;
+    }
+    location  /static {
+      alias {{ MHN_HOME }}/server/mhn/static;
+    }
+}
+

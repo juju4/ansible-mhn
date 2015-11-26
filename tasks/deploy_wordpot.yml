@@ -1,0 +1,60 @@
+---
+- name: MHN Client | registration
+#  get_url: "url={{ server_url }}/static/registration.txt dest=/root/registration.sh mode=0700"
+#- command: 'bash /root/registration.sh {{ server_url }} {{ deploy_key }} "wordpot"'
+#  include: registration.yml server_url={{ server_url }} deploy_key={{ deploy_key }} honeypot=wordpot
+  include: registration.yml honeypot=wordpot
+- set_fact:
+    deploy: /root/.registration_done-wordpot
+
+- shell: "echo {{ server_url }} | sed 's#^http://##; s#^https://##; s#/.*$##; s/:.*$//'"
+  register: HPF_HOST
+  changed_when: False
+- set_fact:
+    HPF_PORT: 10000
+- shell: "python -c 'import json;obj=json.load(file(\"{{ deploy }}\"));print obj[\"identifier\"]'"
+  register: HPF_IDENT
+  changed_when: False
+- shell: "python -c 'import json;obj=json.load(file(\"{{ deploy }}\"));print obj[\"secret\"]'"
+  register: HPF_SECRET
+  changed_when: False
+
+- name: Ubuntu | Install wordpot dependencies
+  apt: name={{item}} state=present update_cache=yes
+  with_items:
+    - git
+    - python-pip
+    - python-virtualenv
+
+- stat: path=/opt/wordpot
+  register: wordpotdir
+- name: git clone wordpot
+  git:
+    repo=https://github.com/threatstream/wordpot.git
+    dest=/opt/wordpot
+  when: not wordpotdir.stat.exists
+
+- name: Install wordpot virtualenv
+  pip: requirements=/opt/wordpot/requirements.txt
+    virtualenv=/opt/wordpot/env
+
+- replace: "dest=/opt/wordpot/wordpot.conf regexp='{{ item.regexp }}' replace='{{ item.replace }}' backup=yes"
+  with_items:
+    - { regexp: 'HPFEEDS_.*', replace: '' }
+    - { regexp: '^HOST\s.*', replace: "HOST = '0.0.0.0'" }
+
+- lineinfile: "dest=/opt/wordpot/wordpot.conf regexp='{{ item.regexp }}' line='{{ item.line }}'"
+  with_items:
+    - { regexp: '^HPFEEDS_ENABLED = True', line: 'HPFEEDS_ENABLED = True' }
+    - { regexp: "^HPFEEDS_HOST = '{{ HPF_HOST.stdout }}'", line: "HPFEEDS_HOST = '{{ HPF_HOST.stdout }}'" }
+    - { regexp: "^HPFEEDS_PORT = '{{ HPF_PORT }}'", line: "HPFEEDS_PORT = '{{ HPF_PORT }}'" }
+    - { regexp: "^HPFEEDS_IDENT = '{{ HPF_IDENT.stdout }}'", line: "HPFEEDS_IDENT = '{{ HPF_IDENT.stdout }}'" }
+    - { regexp: "^HPFEEDS_SECRET = '{{ HPF_SECRET.stdout }}'", line: "HPFEEDS_SECRET = '{{ HPF_SECRET.stdout }}'" }
+    - { regexp: "^HPFEEDS_TOPIC = 'wordpot.events'", line: "HPFEEDS_TOPIC = 'wordpot.events'" }
+
+
+- copy: src=wordpot.conf dest=/etc/supervisor/conf.d/wordpot.conf mode=0644
+  notify:
+    - supervisor update
+
+

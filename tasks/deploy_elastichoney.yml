@@ -1,0 +1,50 @@
+---
+- name: MHN Client | registration
+  include: registration.yml honeypot=elastichoney
+- set_fact:
+    deploy: /root/.registration_done-elastichoney
+
+- shell: "echo {{ server_url }} | sed 's#^http://##; s#^https://##; s#/.*$##; s/:.*$//'"
+  register: HPF_HOST
+  changed_when: False
+- set_fact:
+    HPF_PORT: 10000
+- shell: "python -c 'import json;obj=json.load(file(\"{{ deploy }}\"));print obj[\"identifier\"]'"
+  register: HPF_IDENT
+  changed_when: False
+- shell: "python -c 'import json;obj=json.load(file(\"{{ deploy }}\"));print obj[\"secret\"]'"
+  register: HPF_SECRET
+  changed_when: False
+
+- name: Ubuntu | Install elastichoney dependencies
+  apt: name={{item}} state=present update_cache=yes
+  with_items:
+    - git
+    - golang
+    - supervisor
+
+- stat: path=/opt/elastichoney
+  register: elastichoneydir
+- name: git clone elastichoney
+  git:
+    repo=https://github.com/threatstream/elastichoney.git
+    dest=/opt/elastichoney
+  when: not elastichoneydir.stat.exists
+
+- stat: path=/opt/elastichoney/elastichoney
+  register: stgo
+- shell: "{{ item }} chdir=/opt/elastichoney"
+  with_items:
+    - 'go get || true'
+    - 'go build'
+  environment: 
+    GOPATH: /opt/elastichoney
+    GOBIN: /usr/bin
+  when: not stgo.stat.exists
+
+- template: src=elastichoney-config.json dest=/opt/elastichoney/config.json mode=0644
+
+- copy: src=elastichoney.conf dest=/etc/supervisor/conf.d/elastichoney.conf mode=0644
+  notify:
+    - supervisor update
+

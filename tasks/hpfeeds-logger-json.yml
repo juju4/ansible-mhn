@@ -1,0 +1,41 @@
+---
+
+- name: Ubuntu | Install hpfeeds-logger-json dependencies
+  apt: name={{item}} state=present update_cache=yes
+  with_items:
+    - git
+    - python-pip
+    - python-dev
+    - libgeoip-dev
+    - python-virtualenv
+    - supervisor
+
+- name: Install hpfeeds-logger-json virtualenv
+  pip: name="{{ item }}"
+    virtualenv=/opt/hpfeeds-logger
+  with_items:
+    - hpfeeds-logger==0.0.7.0
+
+- set_fact:
+    IDENT: hpfeeds-logger-json
+- stat: path=/root/.hpfeeds-logger-json
+  register: sstat
+- shell: "python -c 'import uuid;print str(uuid.uuid4()).replace(\"-\",\"\")' | tee /root/.hpfeeds-logger-json"
+  when: not sstat.stat.exists
+- command: "cat /root/.hpfeeds-logger-json"
+  register: SECRET
+- set_fact:
+    CHANNELS: 'amun.events,dionaea.connections,dionaea.capture,glastopf.events,beeswarm.hive,kippo.sessions,conpot.events,snort.alerts,suricata.events,wordpot.events,shockpot.events,p0f.events,elastichoney.events'
+
+
+- template: src=json.json dest=/opt/hpfeeds-logger/json.json mode=0600
+
+- command: '/opt/hpfeeds/env/bin/python /opt/hpfeeds/broker/add_user.py "{{ IDENT }}" "{{ SECRET.stdout }}" "" "{{ CHANNELS }}"'
+
+- file: path=/var/log/mhn state=directory mode=0755
+
+- template: src=hpfeeds-logger-json.conf dest=/etc/supervisor/conf.d/hpfeeds-logger-json.conf mode=0644
+  notify:
+    - supervisor update
+
+

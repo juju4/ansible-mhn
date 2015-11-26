@@ -1,0 +1,54 @@
+---
+- name: MHN Client | registration
+  include: registration.yml honeypot=amun
+- set_fact:
+    deploy: /root/.registration_done-amun
+
+- shell: "echo {{ server_url }} | sed 's#^http://##; s#^https://##; s#/.*$##; s/:.*$//'"
+  register: HPF_HOST
+  changed_when: False
+- set_fact:
+    HPF_PORT: 10000
+- shell: "python -c 'import json;obj=json.load(file(\"{{ deploy }}\"));print obj[\"identifier\"]'"
+  register: HPF_IDENT
+  changed_when: False
+- shell: "python -c 'import json;obj=json.load(file(\"{{ deploy }}\"));print obj[\"secret\"]'"
+  register: HPF_SECRET
+  changed_when: False
+
+- name: Ubuntu | Install amun dependencies
+  apt: name={{item}} state=present update_cache=yes
+  with_items:
+    - git
+    - supervisor
+    - python-pip
+
+- stat: path=/opt/amun
+  register: amundir
+- name: git clone amun
+  git:
+    repo=https://github.com/zeroq/amun.git
+    dest=/opt/amun
+    version=development
+  when: not amundir.stat.exists
+
+- replace: "dest=/opt/amun/conf/amun.conf regexp='{{ item.regexp }}' replace='{{ item.replace }}' backup=yes"
+  with_items:
+    - { regexp: 'ip: 127.0.0.1', replace: 'ip: 0.0.0.0' }
+    - { regexp: '    vuln-http,', replace: "#   vuln-http," }
+    - { regexp: 'log_modules:', replace: "log_modules:\\\n    log-hpfeeds" }
+
+- file: path=/opt/amun/hexdumps state=directory mode=0755
+
+- shell: "{{ item }}"
+  with_items:
+    - 'echo "104854" > /proc/sys/fs/file-max'
+    - 'ulimit -Hn 104854'
+    - 'ulimit -n 104854'
+
+- template: src=log-hpfeeds.conf dest=/opt/amun/conf/log-hpfeeds.conf mode=0644
+
+- template: src=amun.conf dest=/etc/supervisor/conf.d/amun.conf mode=0644
+  notify:
+    - supervisor update
+

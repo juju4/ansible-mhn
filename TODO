@@ -1,0 +1,24 @@
+
+https://gist.github.com/glaslos/ac8c32e90ba33e01624e
+https://www.enisa.europa.eu/activities/cert/support/proactive-detection/proactive-detection-of-security-incidents-II-honeypots
+
+https://github.com/Novetta/delilah
+http://www.novetta.com/wp-content/uploads/2015/06/NTRG_ElasticBotnetReport_06102015.pdf
+
+?honeywall+honeypot
+
++ High-Interaction Server-Side
+Honeypots
+- Argos
+- HiHAT
+- SSH: Bifrozt, DockPot, HonSSH
+
+Hybrid Honeypots
+- HoneySpider
+- SURFcert IDS
+- SSH: Bifrozt
+
+
++ Low
+- Sinkholes: HoneySink
+

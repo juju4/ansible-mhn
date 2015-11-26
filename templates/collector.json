@@ -1,0 +1,6 @@
+{
+  "IDENT": "collector",
+  "SECRET": "{{ SECRET }}",
+  "MHN_UUID": "{{ MHN_UUID }}"
+}
+

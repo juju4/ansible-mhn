@@ -1,0 +1,17 @@
+---
+- name: Install MHN Server
+  include: server.yml
+  when: mhnmode == 'server'
+
+- name: Install MHN Client
+  include: client.yml
+  when: mhnmode == 'client'
+
+- name: Debian | Check if a reboot is required
+  register: file
+  stat: path=/var/run/reboot-required get_md5=no
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
+
+- name: Reboot the server
+  command: /sbin/reboot
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and file.stat.exists == true and (noreboot is not defined and not noreboot)

@@ -1,0 +1,41 @@
+---
+## server part
+- name: Debian | Install MHN server dependencies
+  apt: name={{item}} state=present
+  with_items:
+    - git
+    - python-pip
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+- stat: path={{ MHN_HOME }}
+  register: mhnrepo
+- name: Clone MHN repository
+  git:
+    repo=https://github.com/threatstream/mhn.git
+    dest={{ MHN_HOME }}
+  when: not mhnrepo.stat.exists
+
+- name: Install MHN Server - hpfeeds
+  include: hpfeeds.yml
+- name: Install MHN Server - mnemosyne
+  include: mnemosyne.yml
+- name: Install MHN Server - honeymap
+  include: honeymap.yml
+- name: Install MHN Server - mhnserver
+  include: mhnserver.yml
+
+- include: splunk.yml
+  when: do_splunk is defined and do_splunk
+- include: arcsight.yml
+  when: do_arcsight is defined and do_arcsight
+- include: elk.yml
+  when: do_elk is defined and do_elk
+
+- name: Common directories
+  file: "dest={{ item }} mode=0755 state=directory"
+  with_items:
+    - "{{ backupdir }}"
+    - "{{ scriptsdir }}"
+- name: setup backup configuration
+  template: "src=mhn-backup.sh.j2 dest={{ scriptsdir }}/mhn-backup.sh mode=0755"
+- cron: name="mhn-backup" minute="30" hour="3" weekday="0" job="{{ scriptsdir }}/mhn-backup.sh > /dev/null 2>&1"
+

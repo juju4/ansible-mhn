@@ -1,0 +1,78 @@
+---
+### Server configuration
+mhnmode: server
+#mhn_splunk:
+#mhn_elk:
+#mhnmode: client
+#mhnserverip:
+
+MHN_HOME: /var/mhn
+MHN_EMAIL: root@localhost
+MHN_PASS: root@localhost
+## if defined, web interface will be only https and not default http
+httpsport: 50443
+certinfo: '/C=US/ST=CA/L=San Francisco/O=Ansible'
+## if http
+#server_url: http://10.254.254.100
+## if https
+server_url: "https://10.254.254.100:{{ httpsport }}"
+## if self-signed certificate
+#curl_arg: ''
+curl_arg: '-k'
+
+do_splunk: false
+do_arcsight: false
+do_elk: false
+
+## FIXME! missing option
+#whitelist_ip: [ ]
+
+## https://github.com/threatstream/mhn/blob/master/scripts/install_mnemosyne.sh
+IDENT: mnemosyne
+CHANNELS: 'amun.events,conpot.events,thug.events,beeswarm.hive,dionaea.capture,dionaea.connections,thug.files,beeswarn.feeder,cuckoo.analysis,kippo.sessions,glastopf.events,glastopf.files,mwbinary.dionaea.sensorunique,snort.alerts,wordpot.events,p0f.events,suricata.events,shockpot.events,elastichoney.events'
+
+golang_v: 1.4.2
+
+### Client configuration
+#mhnmode: client
+## Attention Kippo is moving real ssh port from 22 to 2222...
+## Conflicts: over port 80: amun, glastopf, shockpot, wordpot
+## Amun: low-interaction honeypot, like Nepenthes or Omnivora, designed to capture autonomous spreading malware in an automated fashion, 2012
+amun: false
+## Conpot:  low interactive server side Industrial Control Systems honeypot, 2015
+conpot: false
+## Dionaea: low-interaction honeypot that captures attack payloads and malware, 2013. multiple ports (http/https disabled by default)
+dionaea: false
+## A Simple Elasticsearch Honeypot, 2015
+elastichoney: false
+## mulates thousands of vulnerabilities to gather data from attacks targeting web applications, 2015
+glastopf: false
+## medium interaction SSH honeypot designed to log brute force attacks and, most importantly, the entire shell interaction performed by the attacker, 2015. Alternative Cowrie
+kippo: false
+p0f: false
+#TODOraspberry: false
+## web app honeypot created by ThreatStream Labs, 2014
+shockpot: false
+snort: false
+#TODOsuricata: false
+## Wordpress honeypot, 2014
+wordpot: false
+
+HONEYPOT_SSH_VERSION: "SSH-2.0-OpenSSH_5.5p1 Debian-4ubuntu5"
+
+## key seems to be unique per mhnserver host
+## FIXME! can be recovered inside server:/var/mhn/server/config.py
+#deploy_key: 
+## kippo settings
+## FIXME! switch of ssh port is deadly for vagrant/ansible... how to accomodate
+#real_ssh_port: 2222
+real_ssh_port: 
+kippo_ssh_port: 22
+
+## deploy_snort
+if_snort: eth0
+
+backupdir: /var/_backup
+scriptsdir: /usr/local/scripts
+noreboot: true
+

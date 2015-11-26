@@ -1,0 +1,143 @@
+---
+- name: MHN Client | registration
+  include: registration.yml honeypot=snort
+- set_fact:
+    deploy: /root/.registration_done-snort
+
+- shell: "echo {{ server_url }} | sed 's#^http://##; s#^https://##; s#/.*$##; s/:.*$//'"
+  register: HPF_HOST
+  changed_when: False
+- set_fact:
+    HPF_PORT: 10000
+- shell: "python -c 'import json;obj=json.load(file(\"{{ deploy }}\"));print obj[\"identifier\"]'"
+  register: HPF_IDENT
+  changed_when: False
+- shell: "python -c 'import json;obj=json.load(file(\"{{ deploy }}\"));print obj[\"secret\"]'"
+  register: HPF_SECRET
+  changed_when: False
+- shell: "ifconfig {{ if_snort }} | awk -F'[ :]' '/inet addr/ {print $13}'"
+  register: ipaddr
+  changed_when: False
+
+- name: Ubuntu | Install snort dependencies
+  apt: name={{item}} state=present update_cache=yes
+  with_items:
+    - git
+    - supervisor
+    - build-essential
+    - libpcap-dev
+    - libjansson-dev
+    - libpcre3-dev
+    - libdnet-dev
+    - libdumbnet-dev
+    - libdaq-dev
+    - flex
+    - bison
+    - python-pip
+    - make
+    - automake
+    - libtool
+    - zlib1g-dev
+    - python-virtualenv
+    - libev-dev
+    - libev4
+
+## former is needed if older release present (conpot)
+#- command: "pip install --upgrade distribute"
+- pip: name=distribute state=present
+
+- stat: path=/opt/hpfeeds
+  register: githpfeeds
+- name: git clone hpfeeds
+  git:
+    repo=https://github.com/threatstream/hpfeeds
+    dest=/opt/hpfeeds
+  when: not githpfeeds.stat.exists
+- stat: path=/opt/hpfeeds/.libhpfeeds_install
+  register: libhpfeeds
+- command: "{{ item }} chdir=/opt/hpfeeds/appsupport/libhpfeeds"
+  with_items:
+    - autoreconf --install
+    - ./configure
+    - make
+    - make install
+  when: not libhpfeeds.stat.exists
+- file: dest=/opt/hpfeeds/.libhpfeeds_install state=touch
+  when: not libhpfeeds.stat.exists
+
+- stat: path=/opt/snortrepo
+  register: gitsnort
+- name: git clone hpfeeds
+  git:
+    repo=https://github.com/threatstream/snort.git
+    dest=/opt/snortrepo
+    version=hpfeeds-support
+  when: not gitsnort.stat.exists
+- stat: path=/opt/snort/bin/snort
+  register: optsnort
+- command: "{{ item }} chdir=/opt/snortrepo"
+  with_items:
+    - ./configure --prefix=/opt/snort
+    - make
+    - make install
+  environment: 
+    CPPFLAGS: -I/include
+  when: not optsnort.stat.exists
+
+- file: "path={{ item }} state=directory mode=0755"
+  with_items:
+    - /opt/snort/etc
+    - /opt/snort/rules
+    - /opt/snort/lib/snort_dynamicrules
+    - /opt/snort/lib/snort_dynamicpreprocessor
+    - /var/log/snort
+
+- stat: path=/opt/snort/etc/snort.conf
+  register: snortconf
+- command: "rsync -ci /opt/snortrepo/etc/{{ item }} /opt/snort/etc/{{ item }}"
+  with_items:
+    - snort.conf
+    - classification.config
+    - reference.config
+    - threshold.conf
+    - unicode.map
+  register: rsync_result
+  changed_when: 'rsync_result.stdout != ""'
+  when: not snortconf.stat.exists
+- file: "dest=/opt/snort/etc/{{ item }} mode=0644"
+  with_items:
+    - snort.conf
+    - classification.config
+    - reference.config
+    - threshold.conf
+    - unicode.map
+
+- stat: path=/opt/snort/rules/white_list.rules
+  register: wrules
+- file: "path=/opt/snort/rules/{{ item }} state=touch"
+  with_items:
+    - white_list.rules
+    - black_list.rules
+  when: not wrules.stat.exists
+
+- replace: "dest=/opt/snort/etc/snort.conf regexp='{{ item.regexp }}' replace='{{ item.replace }}' backup=yes"
+  with_items:
+    - { regexp: '/usr/local', replace: '/opt/snort' }
+    - { regexp: '^include \$RULE_PATH/(.*)', replace: '# include $RULE_PATH/\1' }
+    - { regexp: '# include $RULE_PATH/local.rules', replace: 'include $RULE_PATH/local.rules' }
+    - { regexp: 'ipvar HOME_NET any', replace: "ipvar HOME_NET {{ ipaddr.stdout }}" }
+- lineinfile: "dest=/opt/snort/etc/snort.conf regexp='{{ item.regexp }}' line='{{ item.line }}' insertafter='^# hpfeeds'"
+  with_items:
+    - { regexp: '^output log_hpfeeds', line: "output log_hpfeeds: host {{ HPF_HOST.stdout }}, ident {{ HPF_IDENT.stdout }}, secret {{ HPF_SECRET.stdout }}, channel snort.alerts, port {{ HPF_PORT }}" }
+
+- file: src=/opt/mhn/rules/mhn.rules path=/opt/snort/rules/local.rules state=link force=yes
+
+- template: src=snort.conf dest=/etc/supervisor/conf.d/snort.conf mode=0644
+  notify:
+    - supervisor update
+
+- template: src=update_snort_rules.sh dest=/etc/cron.daily/update_snort_rules.sh mode=0755
+
+## FIXME! not idempotent, way to do if file /opt/mhn/rules/mhn.rules older than 3600s ?
+- command: /etc/cron.daily/update_snort_rules.sh
+

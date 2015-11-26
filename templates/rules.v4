@@ -1,0 +1,5 @@
+# MHN client, kippo rules
+*nat
+-A PREROUTING -i eth0 -p tcp -m tcp --dport {{ kippo_ssh_port }} -j DNAT --to-destination 127.0.0.1:64222
+COMMIT
+

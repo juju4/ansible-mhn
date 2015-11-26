@@ -1,0 +1,51 @@
+--- /etc/dionaea/dionaea.conf.0	2015-08-30 02:22:32.435663416 +0000
++++ /etc/dionaea/dionaea.conf	2015-08-30 02:25:21.471666447 +0000
+@@ -252,10 +252,10 @@
+ 		tftp = {
+ 			root = "/var/lib/dionaea/wwwroot"
+ 		}
+-		http = {
+-			root = "/var/lib/dionaea/wwwroot"
+-			max-request-size = "32768" // maximum size in kbytes of the request (32MB)
+-		}
++		//http = {
++		//	root = "/var/lib/dionaea/wwwroot"
++		//	max-request-size = "32768" // maximum size in kbytes of the request (32MB)
++		//}
+ 		sip = {
+ 			udp = {
+ 				port = "5060"
+@@ -350,6 +350,16 @@
+ 			user = "" 		// username (optional)
+ 			pass = ""		// password (optional)
+ 		}
++		hpfeeds = {
++			hp1 = {
++				server = "192.168.200.53"
++				port = "10000"
++				ident = "801252dc-4ebd-11e5-90d0-080027c11ad2"
++				secret = "6dwFt687fvU0wgCr"
++				// dynip_resolve: enable to lookup the sensor ip through a webservice
++				dynip_resolve = "http://queryip.net/ip/"
++			}
++		}
+ 		logsql = {
+ 			mode = "sqlite" // so far there is only sqlite
+ 			sqlite = {
+@@ -466,6 +476,7 @@
+ //			"mwserv",
+ //			"submit_http",
+ //			"logxmpp",
++			"hpfeeds",
+ //			"nfq",
+ //			"p0f",
+ //			"surfids",
+@@ -474,7 +485,7 @@
+ 		}
+ 
+ 		services = {
+-			serve = ["http", "https", "tftp", "ftp", "mirror", "smb", "epmap", "sip","mssql", "mysql"]
++			serve = ["tftp", "ftp", "mirror", "smb", "epmap", "sip","mssql", "mysql"]
+ 		}
+ 
+ 	}

@@ -1,0 +1,28 @@
+---
+galaxy_info:
+  author: juju4
+  description: Modern Honeynet Network (MHN) is a multi-snort and honeypot sensor management, uses a network of VMs, small footprint SNORT installations, stealthy dionaeas, and a centralized server for management.
+  license: BSD
+  min_ansible_version: 1.9
+  platforms:
+  - name: Ubuntu
+    versions:
+  #  - precise
+  #  - quantal
+  #  - raring
+  #  - saucy
+    - trusty
+  - name: Debian
+    versions:
+  #  - all
+  #  - etch
+  #  - lenny
+  #  - squeeze
+  #  - wheezy
+  #  - jessie
+  categories:
+    - networking
+    - system
+    - security
+dependencies: []
+

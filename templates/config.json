@@ -1,0 +1,8 @@
+{
+   "host": "localhost",
+   "port": 10000,
+   "ident": "honeymap",
+   "auth": "{{ SECRET }}",
+   "channel": "geoloc.events"
+}
+

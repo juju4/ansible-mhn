@@ -1,0 +1,106 @@
+---
+- name: Ubuntu | Install mhnserver dependencies
+  apt: name={{item}} state=present update_cache=yes
+  with_items:
+    - build-essential
+    - python-pip
+    - python-dev
+    - git
+    - redis-server
+    - libgeoip-dev
+    - python-virtualenv
+    - nginx
+    - supervisor
+
+- name: Install mhnserver virtualenv
+  pip: requirements={{ MHN_HOME }}/server/requirements.txt
+    virtualenv={{ MHN_HOME }}/env       # path taken from existing scripts, if changed need to change other places
+
+- stat: path={{ MHN_HOME }}/.configdb_initialized
+  register: init_done
+- stat: path={{ MHN_HOME }}/server/config.py
+  register: config_done
+- name: Initialize configuration and database. Please be patient. This can take several minutes
+  command: "{{ item }} chdir={{ MHN_HOME }}/server"
+  with_items:
+## will do nothing if config.py exists
+    - "{{ MHN_HOME }}/env/bin/python generateconfig.py unattended -e {{ MHN_EMAIL }} -p {{ MHN_PASS }} -b {{ server_url }} -y {{ server_url }}:3000 -l {{ MHN_HOME }}/server/mhn.log"
+## out an error if database already initialized
+    - "{{ MHN_HOME }}/env/bin/python initdatabase.py"
+  when: not config_done.stat.exists or not init_done.stat.exists
+- file: path={{ MHN_HOME }}/.configdb_initialized state=touch
+  when: not config_done.stat.exists or not init_done.stat.exists
+ 
+
+- file: path=/opt/www state=directory mode=755
+
+- template: src=default dest=/etc/nginx/sites-available/default mode=0644
+  when: httpsport is undefined
+- file: src=/etc/nginx/sites-available/default dest=/etc/nginx/sites-enabled/default state=link
+  when: httpsport is undefined
+  notify:
+    - nginx restart
+- stat: path=/etc/ssl/{{ ansible_fqdn }}.crt
+  register: localsslcert
+  when: httpsport is defined
+- name: Generale SSL certificate
+  command: openssl req -x509 -nodes -sha256 -days 1095 -newkey rsa:2048 -subj "{{ certinfo }}/CN={{ fqdn }}" -keyout /etc/ssl/private/{{ ansible_fqdn }}.key -out /etc/ssl/{{ ansible_fqdn }}.crt
+  when: not localsslcert.stat.exists and httpsport is defined
+- file: path=/etc/ssl/private/{{ ansible_fqdn }}.key owner=root group=ssl-cert mode=0440
+  when: httpsport is defined
+- template: src=default-ssl dest=/etc/nginx/sites-available/default-ssl mode=0644
+  when: httpsport is defined
+- file: path=/etc/nginx/sites-enabled/default state=absent
+  when: httpsport is defined
+- file: src=/etc/nginx/sites-available/default-ssl dest=/etc/nginx/sites-enabled/default-ssl state=link
+  when: httpsport is defined
+  notify:
+    - nginx restart
+
+- template: src={{ item }} dest=/etc/supervisor/conf.d/{{ item }} mode=0644
+  with_items:
+    - mhn-uwsgi.conf
+    - mhn-celery-worker.conf
+    - mhn-celery-beat.conf
+  notify:
+    - supervisor update
+
+- stat: path={{ MHN_HOME }}/.addusercollector
+  register: addusercollector
+- set_fact:
+    MHN_UUID: "{{ 100 | random }}"
+  when: not addusercollector.stat.exists
+- set_fact:
+    SECRET: "{{ 100 | random }}"
+  when: not addusercollector.stat.exists
+- command: '/opt/hpfeeds/env/bin/python /opt/hpfeeds/broker/add_user.py "collector" "{{ SECRET }}" "" "geoloc.events"'
+  when: not addusercollector.stat.exists
+- template: src=collector.json dest={{ MHN_HOME }}/server/collector.json mode=0644
+  when: not addusercollector.stat.exists
+- file: path={{ MHN_HOME }}/.addusercollector state=touch
+  when: not addusercollector.stat.exists
+
+- template: src={{ item }} dest=/etc/supervisor/conf.d/{{ item }} mode=0644
+  with_items:
+    - mhn-collector.conf
+  notify:
+    - supervisor update
+
+- name: Make directory owned by www user
+  file:
+    path: "{{ MHN_HOME }}/server"
+    owner: www-data
+    group: www-data
+    recurse: yes
+
+- stat: path={{ MHN_HOME }}/server/mhn.log
+  register: mhnlog
+- file: path={{ MHN_HOME }}/server/mhn.log state=touch mode=0644 owner=www-data group=www-data
+  when: not mhnlog.stat.exists
+- file: src={{ MHN_HOME }}/server/mhn.log dest=/var/log/mhn/mhn.log state=link force=yes
+
+- service: name=nginx enabled=yes
+
+## check everything fine ?
+#sudo supervisorctl status
+

@@ -1,0 +1,53 @@
+---
+- name: MHN Client | registration
+  include: registration.yml honeypot=conpot
+- set_fact:
+    deploy: /root/.registration_done-conpot
+
+- shell: "echo {{ server_url }} | sed 's#^http://##; s#^https://##; s#/.*$##; s/:.*$//'"
+  register: HPF_HOST
+  changed_when: False
+- set_fact:
+    HPF_PORT: 10000
+- shell: "python -c 'import json;obj=json.load(file(\"{{ deploy }}\"));print obj[\"identifier\"]'"
+  register: HPF_IDENT
+  changed_when: False
+- shell: "python -c 'import json;obj=json.load(file(\"{{ deploy }}\"));print obj[\"secret\"]'"
+  register: HPF_SECRET
+  changed_when: False
+
+- name: Ubuntu | Install conpot dependencies
+  apt: name={{item}} state=present update_cache=yes
+  with_items:
+    - git
+    - libsmi2ldbl
+    - snmp-mibs-downloader
+    - python-pip
+    - python-dev
+    - libxml2-dev
+    - libxslt-dev
+    - libmysqlclient-dev
+    - zlib1g-dev
+    - python-virtualenv
+    - supervisor
+
+- pip: name="{{ item }}"
+  with_items:
+    - distribute
+
+- name: Install conpot virtualenv
+  pip: name="{{ item }}"
+    virtualenv=/opt/conpot/env
+  with_items:
+    - setuptools
+    - git+https://github.com/threatstream/hpfeeds.git#egg=hpfeeds-dev
+    - git+https://github.com/glastopf/conpot.git#egg=conpot-dev
+    - git+https://github.com/glastopf/modbus-tk.git#egg=modbus-tk==0.4
+
+- template: src=conpot.cfg dest=/opt/conpot/conpot.cfg mode=0644
+
+- copy: src=conpot.conf dest=/etc/supervisor/conf.d/conpot.conf mode=0644
+  notify:
+    - supervisor update
+
+

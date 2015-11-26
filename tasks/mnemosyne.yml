@@ -1,0 +1,53 @@
+---
+- name: Ubuntu | Install mnemosyne dependencies
+  apt: name={{item}} state=present update_cache=yes
+  with_items:
+    - python-pip
+    - python-dev
+    - git
+    - python-virtualenv
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Debian | install mongodb
+  include: mongodb.yml
+
+- stat: path=/opt/mnemosyne
+  register: gitmnemosyne
+- name: git clone mnemosyne
+  git:
+    repo=https://github.com/threatstream/mnemosyne.git
+    dest=/opt/mnemosyne
+  when: not gitmnemosyne.stat.exists
+
+## FIXME! seems to be run/changed each time?
+## https://github.com/ansible/ansible/issues/6191
+- name: Install mnemosyne virtualenv
+  pip: requirements=/opt/mnemosyne/requirements.txt
+    virtualenv=/opt/mnemosyne/env
+
+- stat: path={{ MHN_HOME }}/.addusermnemosyne
+  register: addusermnemosyne
+- set_fact:
+    SECRET: "{{ 100 | random }}"
+  when: not addusermnemosyne.stat.exists
+- command: '/opt/hpfeeds/env/bin/python /opt/hpfeeds/broker/add_user.py "{{ IDENT }}" "{{ SECRET }}" "" "{{ CHANNELS }}"'
+  when: not addusermnemosyne.stat.exists
+- name: Set up mnemosyne config
+  template: src=mnemosyne.cfg
+    dest=/opt/mnemosyne/mnemosyne.cfg
+    owner=0 group=0 mode=0644
+  when: not addusermnemosyne.stat.exists
+- file: path={{ MHN_HOME }}/.addusermnemosyne state=touch
+  when: not addusermnemosyne.stat.exists
+
+- file: path=/var/log/mhn state=directory mode=755
+
+- name: Ubuntu | Install hpfeeds dependencies
+  apt: name={{item}} state=present update_cache=yes
+  with_items:
+    - supervisor
+
+- copy: src=mnemosyne.conf dest=/etc/supervisor/conf.d/mnemosyne.conf mode=0644
+  notify:
+    - supervisor update
+

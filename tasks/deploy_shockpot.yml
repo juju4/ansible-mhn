@@ -1,0 +1,44 @@
+---
+- name: MHN Client | registration
+  include: registration.yml honeypot=shockpot
+- set_fact:
+    deploy: /root/.registration_done-shockpot
+
+- shell: "echo {{ server_url }} | sed 's#^http://##; s#^https://##; s#/.*$##; s/:.*$//'"
+  register: HPF_HOST
+  changed_when: False
+- set_fact:
+    HPF_PORT: 10000
+- shell: "python -c 'import json;obj=json.load(file(\"{{ deploy }}\"));print obj[\"identifier\"]'"
+  register: HPF_IDENT
+  changed_when: False
+- shell: "python -c 'import json;obj=json.load(file(\"{{ deploy }}\"));print obj[\"secret\"]'"
+  register: HPF_SECRET
+  changed_when: False
+
+- name: Ubuntu | Install shockpot dependencies
+  apt: name={{item}} state=present update_cache=yes
+  with_items:
+    - git
+    - python-pip
+    - supervisor
+    - python-virtualenv
+
+- stat: path=/opt/shockpot
+  register: shockpotdir
+- name: git clone shockpot
+  git:
+    repo=https://github.com/threatstream/shockpot.git
+    dest=/opt/shockpot
+  when: not shockpotdir.stat.exists
+
+- name: Install shockpot virtualenv
+  pip: requirements=/opt/shockpot/requirements.txt
+    virtualenv=/opt/shockpot/env
+
+- template: src=shockpot.conf dest=/opt/shockpot/shockpot.conf mode=0644
+
+- template: src=shockpot.conf dest=/etc/supervisor/conf.d/shockpot.conf mode=0644
+  notify:
+    - supervisor update
+
