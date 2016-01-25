@@ -5,6 +5,7 @@
   with_items:
     - git
     - python-pip
+    - sqlite3
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 - stat: path={{ MHN_HOME }}
   register: mhnrepo
@@ -30,6 +31,10 @@
 - include: elk.yml
   when: do_elk is defined and do_elk
 
+- file: dest=/etc/aide/aide.conf.d state=directory mode=0755
+- name: add additional aide HIDS configuration
+  copy: src=99_aide_local_mhn dest=/etc/aide/aide.conf.d/99_aide_local_mhn mode=0644
+
 - name: Common directories
   file: "dest={{ item }} mode=0755 state=directory"
   with_items:
@@ -38,4 +43,27 @@
 - name: setup backup configuration
   template: "src=mhn-backup.sh.j2 dest={{ scriptsdir }}/mhn-backup.sh mode=0755"
 - cron: name="mhn-backup" minute="30" hour="3" weekday="0" job="{{ scriptsdir }}/mhn-backup.sh > /dev/null 2>&1"
+
+- name: Update MHN_HOME in bashrc - root
+  lineinfile:
+    dest: "{{ item.d }}"
+    line: "{{ item.l }}"
+    regexp: "{{ item.r }}"
+    insertafter: EOF
+    state: present
+    create: False
+  with_items:
+    - { d: "/root/.bashrc", r: "^export MHN_HOME=", l: 'export MHN_HOME={{ MHN_HOME }}' }
+- stat: path="/home/{{ ansible_ssh_user }}"
+  register: homeuser
+- name: Update MHN_HOME in bashrc - ansible_ssh_user
+  lineinfile:
+    dest: "/home/{{ ansible_ssh_user }}/.bashrc"
+    line: "^export MHN_HOME="
+    regexp: "export MHN_HOME={{ MHN_HOME }}"
+    insertafter: EOF
+    state: present
+    create: False
+  when: homeuser.stat.exists
+
 

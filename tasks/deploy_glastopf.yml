@@ -17,7 +17,7 @@
   changed_when: False
 
 - name: Ubuntu | Install glastopf dependencies
-  apt: name={{item}} state=present update_cache=yes
+  apt: name={{item}} state=present update_cache=yes cache_valid_time=3600
   with_items:
     - python2.7
     - python-openssl

@@ -34,6 +34,7 @@ For example
 ```
 
 Once your server is configured, you will need to define additional vars (server_url, deploy_key, ...) before deploying clients.
+deploy_key can be retrieved either from Web UI, either from /var/mhn/server/config.py.
 
 If you use kippo, after first execution, you must change ssh port in your inventory file (manual inventory or vagrant .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory) or Vagrantfile (config.ssh.port) else you will have no connection. Eventually, you can override it from ansible command line (-e).
 
@@ -59,6 +60,25 @@ Most important are
 * httpsport: to be define if you want the webserver (nginx) to be configured https only on this port. server_url need to reflect that and if you use a self-signed certificate, curl_arg too.
 * deploy_key: once server is configured, you can extract this value in /var/mhn/server/config.py or through web interface > deploy. It is mandatory for client configuration.
 
+## Continuous integration
+
+you can test this role with test kitchen.
+In the role folder, run
+```
+$ kitchen verify
+```
+
+Known bugs
+* Ubuntu: the notify 'supervisor restart' fails the first time and nginx too. not sure
+  why. second time run is fine after you do ```sudo service supervisor restart; sudo service nginx restart```
+  (failed notified handlers).
+?
+https://github.com/ansible/ansible/issues/8155
+https://github.com/ansible/ansible/issues/3977
+https://groups.google.com/forum/#!msg/ansible-project/3ot5-ykkAew/ygrdCMnaeHQJ
+
+## Troubleshooting & Known issues
+
 ## Known Issues
 
 * for some reason, honeymap doesn't work on https but is ok on http
@@ -73,7 +93,8 @@ $ ansible-playbook -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_in
 
 ## FAQ
 
-To be filled
+Check
+https://github.com/threatstream/mhn/wiki/MHN-Troubleshooting-Guide
 
 ## License
 

@@ -1,6 +1,6 @@
 ---
 - name: Ubuntu | Install hpfeeds dependencies
-  apt: name={{item}} state=present update_cache=yes
+  apt: name={{item}} state=present update_cache=yes cache_valid_time=3600
   with_items:
     - libffi-dev
     - build-essential
@@ -10,6 +10,7 @@
     - libssl-dev
     - python-virtualenv
     - libev-dev
+    - supervisor
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 - name: Debian | install mongodb
@@ -35,11 +36,6 @@
     - file:///opt/hpfeeds
 
 - file: path=/var/log/mhn state=directory mode=755
-
-- name: Ubuntu | Install hpfeeds dependencies
-  apt: name={{item}} state=present update_cache=yes
-  with_items:
-    - supervisor
 
 - copy: src=hpfeeds-broker.conf dest=/etc/supervisor/conf.d/hpfeeds-broker.conf mode=0644
   notify:

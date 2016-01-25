@@ -1,11 +1,12 @@
 ---
 - name: Ubuntu | Install mnemosyne dependencies
-  apt: name={{item}} state=present update_cache=yes
+  apt: name={{item}} state=present update_cache=yes cache_valid_time=3600
   with_items:
     - python-pip
     - python-dev
     - git
     - python-virtualenv
+    - supervisor
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 - name: Debian | install mongodb
@@ -41,11 +42,6 @@
   when: not addusermnemosyne.stat.exists
 
 - file: path=/var/log/mhn state=directory mode=755
-
-- name: Ubuntu | Install hpfeeds dependencies
-  apt: name={{item}} state=present update_cache=yes
-  with_items:
-    - supervisor
 
 - copy: src=mnemosyne.conf dest=/etc/supervisor/conf.d/mnemosyne.conf mode=0644
   notify:

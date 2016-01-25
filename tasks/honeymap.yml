@@ -1,12 +1,13 @@
 ---
 - name: Ubuntu | Install honeymap dependencies
-  apt: name={{item}} state=present update_cache=yes
+  apt: name={{item}} state=present update_cache=yes cache_valid_time=3600
   with_items:
     - git
     - mercurial
     - make
     - coffeescript
     - libgeoip-dev
+    - supervisor
 
 ## recent golang? 1.4.2
 ## alternative? https://launchpad.net/~evarlast/+archive/ubuntu/golang1.4
@@ -75,11 +76,6 @@
   when: not stgo.stat.exists
 
 - file: path=/var/log/mhn state=directory mode=755
-
-- name: Ubuntu | Install supervisor
-  apt: name={{item}} state=present update_cache=yes
-  with_items:
-    - supervisor
 
 - copy: src=honeymap.conf dest=/etc/supervisor/conf.d/honeymap.conf mode=0644
   notify:

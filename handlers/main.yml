@@ -1,6 +1,11 @@
 ---
 - name: supervisor update
-  command: 'supervisorctl update'
+#  command: 'supervisorctl update'
+#  service: name=supervisor state=reloaded
+#  shell: 'supervisorctl stop all; supervisorctl start all'
+  service: name=supervisor state=restarted
+## BUG/FIXME!
+  ignore_errors: true
 - name: nginx restart
   service: name=nginx state=restarted
 - name: restart ssh

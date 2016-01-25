@@ -1,6 +1,6 @@
 ---
 - name: Ubuntu | Install mhnserver dependencies
-  apt: name={{item}} state=present update_cache=yes
+  apt: name={{item}} state=present update_cache=yes cache_valid_time=3600
   with_items:
     - build-essential
     - python-pip
@@ -11,6 +11,7 @@
     - python-virtualenv
     - nginx
     - supervisor
+    - ssl-cert
 
 - name: Install mhnserver virtualenv
   pip: requirements={{ MHN_HOME }}/server/requirements.txt
@@ -44,7 +45,7 @@
   register: localsslcert
   when: httpsport is defined
 - name: Generale SSL certificate
-  command: openssl req -x509 -nodes -sha256 -days 1095 -newkey rsa:2048 -subj "{{ certinfo }}/CN={{ fqdn }}" -keyout /etc/ssl/private/{{ ansible_fqdn }}.key -out /etc/ssl/{{ ansible_fqdn }}.crt
+  command: openssl req -x509 -nodes -sha256 -days 1095 -newkey rsa:2048 -subj "{{ certinfo }}/CN={{ ansible_fqdn }}" -keyout /etc/ssl/private/{{ ansible_fqdn }}.key -out /etc/ssl/{{ ansible_fqdn }}.crt
   when: not localsslcert.stat.exists and httpsport is defined
 - file: path=/etc/ssl/private/{{ ansible_fqdn }}.key owner=root group=ssl-cert mode=0440
   when: httpsport is defined

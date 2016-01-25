@@ -1,7 +1,11 @@
 ## aide config for mhn server and nodes
 ## server
 /var/lib/mongodb/mnemosyne.*$ VarFile
+/var/lib/mongodb/journal/j._*$ VarFile
+/var/lib/mongodb/journal/lsn$ VarFile
 /var/log/mhn$ VarDir
+/var/mhn/server$ VarDir
+/var/mhn/server/mhn.log*$ VarFile
 ## node
 !/opt/glastopf/data/dork_pages
 /opt/glastopf/db/glastopf.db$ VarFile
@@ -17,3 +21,4 @@
 !/opt/bro/spool/tmp
 !/opt/bro/spool/bro
 !/opt/bro/logs
+!/opt/glastopf/log
