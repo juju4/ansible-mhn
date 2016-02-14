@@ -12,6 +12,7 @@
     - nginx
     - supervisor
     - ssl-cert
+    - libsqlite3-dev
 
 - name: Install mhnserver virtualenv
   pip: requirements={{ MHN_HOME }}/server/requirements.txt
