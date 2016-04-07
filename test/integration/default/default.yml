@@ -1,10 +1,7 @@
 ---
 
-- hosts: test-kitchen
+- hosts: all
   vars:
-#    - ansible_ssh_user: "{{ (ansible_ssh_user if (ansible_ssh_user | bool and ansible_ssh_user != 'root') else lookup('env', 'USER')) }}"
-#    - ansible_ssh_user: "{{ lookup('env', 'USER')) }}"
-    - ansible_ssh_user: lookup('env', 'USER'))
     - mhnmode: server
     - MHN_EMAIL: root@localhost
     - MHN_PASS: root@localhost

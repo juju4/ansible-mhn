@@ -80,7 +80,7 @@
     - ./configure --prefix=/opt/snort
     - make
     - make install
-  environment: 
+  environment:
     CPPFLAGS: -I/include
   when: not optsnort.stat.exists
 

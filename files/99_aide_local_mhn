@@ -22,3 +22,4 @@
 !/opt/bro/spool/bro
 !/opt/bro/logs
 !/opt/glastopf/log
+!/opt/kippo/log

@@ -1,4 +1,7 @@
 ---
+
+mhn_user: _mhn
+
 ### Server configuration
 mhnmode: server
 #mhn_splunk:
@@ -62,11 +65,11 @@ HONEYPOT_SSH_VERSION: "SSH-2.0-OpenSSH_5.5p1 Debian-4ubuntu5"
 
 ## key seems to be unique per mhnserver host
 ## FIXME! can be recovered inside server:/var/mhn/server/config.py
-#deploy_key: 
+#deploy_key:
 ## kippo settings
 ## FIXME! switch of ssh port is deadly for vagrant/ansible... how to accomodate
 #real_ssh_port: 2222
-real_ssh_port: 
+real_ssh_port:
 kippo_ssh_port: 22
 
 ## deploy_snort

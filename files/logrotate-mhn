@@ -1,0 +1,17 @@
+## /etc/logrotate.d/mhn
+/var/log/mhn/*.log
+/var/log/mhn/*.err
+{
+	rotate 12
+	weekly
+	missingok
+	create 0644 syslog adm
+	notifempty
+	delaycompress
+	compress
+	postrotate
+		restart supervisor >/dev/null 2>&1 || true
+		setfacl -m "u:nagios:r--" -- $1 >/dev/null 2>&1 || true;
+	endscript
+}
+

@@ -1,0 +1,2 @@
+## logcheck rules for a mhn setup
+^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ CRON\[[[:digit:]]+\]: message repeated [0-9]+ times: \[ (root) CMD (/opt/bro/bin/broctl cron)\]

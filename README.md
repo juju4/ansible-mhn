@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/juju4/ansible-mhn.svg?branch=master)](https://travis-ci.org/juju4/ansible-mhn)
 # MHN Server and Clients ansible roles
 
 Mostly a conversion of the shell scripts of https://github.com/threatstream/mhn to ansible config

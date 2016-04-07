@@ -32,7 +32,7 @@
   when: not config_done.stat.exists or not init_done.stat.exists
 - file: path={{ MHN_HOME }}/.configdb_initialized state=touch
   when: not config_done.stat.exists or not init_done.stat.exists
- 
+
 
 - file: path=/opt/www state=directory mode=755
 

@@ -1,4 +1,8 @@
 ---
+- name: check role user exists
+  user: "name={{ mhn_user }} home={{ MHN_HOME }}"
+  become: yes
+
 ## server part
 - name: Debian | Install MHN server dependencies
   apt: name={{item}} state=present
@@ -14,6 +18,8 @@
     repo=https://github.com/threatstream/mhn.git
     dest={{ MHN_HOME }}
   when: not mhnrepo.stat.exists
+  become: yes
+  become_user: "{{ mhn_user }}"
 
 - name: Install MHN Server - hpfeeds
   include: hpfeeds.yml
@@ -54,16 +60,23 @@
     create: False
   with_items:
     - { d: "/root/.bashrc", r: "^export MHN_HOME=", l: 'export MHN_HOME={{ MHN_HOME }}' }
-- stat: path="/home/{{ ansible_ssh_user }}"
+- stat: path="{{ MHN_HOME }}"
   register: homeuser
-- name: Update MHN_HOME in bashrc - ansible_ssh_user
+- name: Update MHN_HOME in bashrc - mhn_user
   lineinfile:
-    dest: "/home/{{ ansible_ssh_user }}/.bashrc"
+    dest: "{{ MHN_HOME }}/.bashrc"
     line: "^export MHN_HOME="
     regexp: "export MHN_HOME={{ MHN_HOME }}"
     insertafter: EOF
     state: present
     create: False
   when: homeuser.stat.exists
+
+- name: add mhn logrotate.d configuration
+  copy: src=logrotate-mhn dest=/etc/logrotate.d/mhn mode=0644 backup=yes
+- name: Ensure nrpe.d dir exists
+  file: dest=/etc/nagios/nrpe.d state=directory mode=0755
+- name: add some nrpe commands for monitoring
+  copy: src=mhn-nrpe.cfg dest=/etc/nagios/nrpe.d/mhn-nrpe.cfg mode=0644
 
 

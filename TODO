@@ -1,4 +1,5 @@
 
+
 https://gist.github.com/glaslos/ac8c32e90ba33e01624e
 https://www.enisa.europa.eu/activities/cert/support/proactive-detection/proactive-detection-of-security-incidents-II-honeypots
 
@@ -18,7 +19,18 @@ Hybrid Honeypots
 - SURFcert IDS
 - SSH: Bifrozt
 
+https://www.secureworks.com/blog/dcept
 
 + Low
 - Sinkholes: HoneySink
+
+++ Monitor mongodb size /var/lib/mongodb/
+++ nagios monitor
+
+++ celery worker eating half CPU
+
+++ WARNING: you are running uWSGI as root !!! (use the --uid flag)
++https://uwsgi-docs.readthedocs.org/en/latest/Namespaces.html
++use emperor mode: https://wiki.archlinux.org/index.php/Uwsgi
++https://uwsgi-docs.readthedocs.org/en/latest/Emperor.html#tyrant-mode-secure-multi-user-hosting
 

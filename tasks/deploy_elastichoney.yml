@@ -37,7 +37,7 @@
   with_items:
     - 'go get || true'
     - 'go build'
-  environment: 
+  environment:
     GOPATH: /opt/elastichoney
     GOBIN: /usr/bin
   when: not stgo.stat.exists

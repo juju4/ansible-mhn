@@ -63,14 +63,14 @@
   with_items:
     - go get
     - go build
-  environment: 
+  environment:
     GOPATH: /opt/honeymap/server
     GOBIN: /usr/local/go/bin
   when: not stgo.stat.exists
 - command: "{{ item }} chdir=/opt/honeymap"
   with_items:
     - make
-  environment: 
+  environment:
     GOPATH: /opt/honeymap/server
     GOBIN: /usr/local/go/bin
   when: not stgo.stat.exists
