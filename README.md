@@ -63,10 +63,13 @@ Most important are
 
 ## Continuous integration
 
-you can test this role with test kitchen.
-In the role folder, run
+This role has a travis basic test (for github), more advanced with kitchen.
+
+Once you ensured all necessary roles are present, You can test with:
 ```
+$ cd /path/to/roles/mhn
 $ kitchen verify
+$ kitchen login
 ```
 
 Known bugs
@@ -91,6 +94,7 @@ $ Vagrant up node3
 [provision all systems which are up]
 $ ansible-playbook -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory site.yml --limit node3
 * DigitalOcean: 512MB box by default has no swap, add it or face Out of Memory killing especially on master server
+* idempotency: failing
 
 ## FAQ
 
