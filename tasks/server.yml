@@ -1,6 +1,6 @@
 ---
 - name: check role user exists
-  user: "name={{ mhn_user }} home={{ MHN_HOME }}"
+  user: "name={{ mhn_user }} home={{ mhn_userdir }}"
   become: yes
 
 ## server part
@@ -64,7 +64,7 @@
   register: homeuser
 - name: Update MHN_HOME in bashrc - mhn_user
   lineinfile:
-    dest: "{{ MHN_HOME }}/.bashrc"
+    dest: "{{ mhn_userdir }}/.bashrc"
     line: "^export MHN_HOME="
     regexp: "export MHN_HOME={{ MHN_HOME }}"
     insertafter: EOF

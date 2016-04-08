@@ -38,6 +38,8 @@
 
 - template: src=default dest=/etc/nginx/sites-available/default mode=0644
   when: httpsport is undefined
+  notify:
+    - nginx restart
 - file: src=/etc/nginx/sites-available/default dest=/etc/nginx/sites-enabled/default state=link
   when: httpsport is undefined
   notify:
@@ -52,8 +54,12 @@
   when: httpsport is defined
 - template: src=default-ssl dest=/etc/nginx/sites-available/default-ssl mode=0644
   when: httpsport is defined
+  notify:
+    - nginx restart
 - file: path=/etc/nginx/sites-enabled/default state=absent
   when: httpsport is defined
+  notify:
+    - nginx restart
 - file: src=/etc/nginx/sites-available/default-ssl dest=/etc/nginx/sites-enabled/default-ssl state=link
   when: httpsport is defined
   notify:

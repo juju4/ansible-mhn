@@ -1,6 +1,7 @@
 ---
 
 mhn_user: _mhn
+mhn_userdir: /var/_mhn
 
 ### Server configuration
 mhnmode: server
@@ -9,7 +10,7 @@ mhnmode: server
 #mhnmode: client
 #mhnserverip:
 
-MHN_HOME: /var/mhn
+MHN_HOME: "{{ mhn_userdir }}/mhn"
 MHN_EMAIL: root@localhost
 MHN_PASS: root@localhost
 ## if defined, web interface will be only https and not default http
