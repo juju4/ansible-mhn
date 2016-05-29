@@ -1,5 +1,5 @@
 {
-    "logfile" : "/opt/elastichoney/elastichoney.log",
+    "logfile" : "/var/log/elastichoney/elastichoney.log",
     "use_remote" : false,
     "remote" : {
         "url" : "http://example.com",
