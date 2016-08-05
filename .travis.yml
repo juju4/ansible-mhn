@@ -37,6 +37,7 @@ before_install:
   - find -ls
   - ln -s ansible-mhn ../mhn && cd ../mhn
   - git clone https://github.com/juju4/ansible-maxmind ../maxmind
+  - cp test/travis/initctl_faker test/
   # Customize container
   - 'sudo docker build --rm=true --file=test/travis/Dockerfile.${distribution}-${version} --tag=${distribution}-${version}:ansible test'
 

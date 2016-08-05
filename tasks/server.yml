@@ -10,6 +10,7 @@
     - git
     - python-pip
     - sqlite3
+    - sudo
     - acl
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 - stat: path={{ MHN_HOME }}

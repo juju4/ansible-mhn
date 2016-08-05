@@ -27,10 +27,25 @@
     - command: "systemctl unmask mongodb"
   when: ansible_distribution == 'Debian' or (ansible_distribution == 'Ubuntu' and ansible_lsb.major_release|int >= 16)
 
-- name: Ubuntu | Install mongodb
+## https://docs.mongodb.com/manual/tutorial/install-mongodb-on-red-hat/
+- block:
+    - name: install mongodb yum repository
+      template: src=mongodb.repo.j2 dest=/etc/yum.repos.d/mongodb.repo mode=0644
+    - set_fact:
+        mongodb_svc: mongod
+  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+- name: apt | Install mongodb
   apt: name={{item}} state=present update_cache=yes cache_valid_time=3600
   with_items:
     - mongodb-org
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: yum | Install mongodb
+  yum: name={{item}} state=present update_cache=yes
+  with_items:
+    - mongodb-org
+  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
 
 ## disappeared in mongodb3, https://docs.mongodb.com/manual/tutorial/rotate-log-files/
 #- name: set log rotation for mongodb
