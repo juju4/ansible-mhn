@@ -3,16 +3,18 @@
   user: "name={{ mhn_user }} home={{ mhn_userdir }}"
   become: yes
 
-## server part
-- name: Debian | Install MHN server dependencies
-  apt: name={{item}} state=present
-  with_items:
-    - git
-    - python-pip
-    - sqlite3
-    - sudo
-    - acl
+- name: Include version-specific variables for Ubuntu.
+  include_vars: "{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml"
+  when: ansible_distribution == 'Ubuntu'
+
+- include: debian.yml
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- include: redhat.yml
+  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+## server part
+
 - stat: path={{ MHN_HOME }}
   register: mhnrepo
 ## Ansible 2.0 on xenial: https://docs.ansible.com/ansible/become.html#becoming-an-unprivileged-user

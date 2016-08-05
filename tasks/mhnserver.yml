@@ -1,5 +1,6 @@
 ---
-- name: Ubuntu | Install mhnserver dependencies
+
+- name: apt | Install mhnserver dependencies
   apt: name={{item}} state=present update_cache=yes cache_valid_time=3600
   with_items:
     - build-essential
@@ -13,6 +14,22 @@
     - supervisor
     - ssl-cert
     - libsqlite3-dev
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: yum | Install mhnserver dependencies
+  yum: name={{item}} state=present update_cache=yes cache_valid_time=3600
+  with_items:
+    - "@Development tools"
+    - python-pip
+    - python-devel
+    - git
+    - redis
+    - GeoIP-devel
+    - python-virtualenv
+    - nginx
+    - supervisor
+    - sqlite-devel
+  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
 
 - name: Install mhnserver virtualenv
   pip: requirements={{ MHN_HOME }}/server/requirements.txt

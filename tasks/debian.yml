@@ -1,0 +1,11 @@
+---
+
+- name: apt | Install MHN server dependencies
+  apt: name={{item}} state=present
+  with_items:
+    - git
+    - python-pip
+    - sqlite3
+    - sudo
+    - acl
+
