@@ -54,3 +54,6 @@
 - name: ensure elastichoney log dir exists
   file: dest=/var/log/elastichoney state=directory mode=0755
 
+- name: add elastichoney logrotate.d configuration
+  copy: src=logrotate-elastichoney dest=/etc/logrotate.d/elastichoney mode=0644 backup=yes
+

@@ -1,4 +1,7 @@
 
+golang 1.4.2 to 1.6.3
+kitchen+travis test ubuntu14 to ubuntu16/14/12+centos6/7
+
 
 https://gist.github.com/glaslos/ac8c32e90ba33e01624e
 https://www.enisa.europa.eu/activities/cert/support/proactive-detection/proactive-detection-of-security-incidents-II-honeypots
@@ -33,4 +36,7 @@ https://www.secureworks.com/blog/dcept
 +https://uwsgi-docs.readthedocs.org/en/latest/Namespaces.html
 +use emperor mode: https://wiki.archlinux.org/index.php/Uwsgi
 +https://uwsgi-docs.readthedocs.org/en/latest/Emperor.html#tyrant-mode-secure-multi-user-hosting
+
+2016/07
+Centos supports seems to have been added + other commits
 

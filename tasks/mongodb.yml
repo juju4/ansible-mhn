@@ -1,12 +1,41 @@
 ---
-- name: Ubuntu | Add Mongodb repository key
-  apt_key: keyserver=hkp://keyserver.ubuntu.com:80 id=7F0CEB10
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
-- name: Ubuntu | Add Mongodb repository
-  apt_repository: repo='deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' state=present
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+- block:
+    - name: Ubuntu | Add Mongodb repository key
+      apt_key: keyserver=hkp://keyserver.ubuntu.com:80 id=7F0CEB10
+    - name: Ubuntu | Add Mongodb repository
+      apt_repository: repo='deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' state=present
+    - set_fact:
+        mongodb_svc: mongod
+  when: (ansible_distribution == 'Ubuntu' and ansible_lsb.major_release|int < 16)
+## https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/
+- block:
+    - name: Apt | Add Mongodb repository key
+      apt_key: keyserver=hkp://keyserver.ubuntu.com:80 id=EA312927
+    - name: Debian | Add Mongodb repository
+      apt_repository: repo='deb http://repo.mongodb.org/apt/{{ ansible_distribution|lower }} {{ ansible_distribution_release }}/mongodb-org/3.2 main' state=present
+      when: ansible_distribution == 'Debian'
+    - name: Ubuntu | Add Mongodb repository
+      apt_repository: repo='deb http://repo.mongodb.org/apt/{{ ansible_distribution|lower }} {{ ansible_distribution_release }}/mongodb-org/3.2 multiverse' state=present
+      when: ansible_distribution == 'Ubuntu'
+    - set_fact:
+        mongodb_svc: mongod
+    - name: configure systemd config file (not included)
+      template: src=mongodb.service.j2 dest=/lib/systemd/system/mongod.service mode=0644
+## http://askubuntu.com/questions/757384/can-i-use-14-04-mongodb-packages-with-16-04
+    - name: enable service mongodb
+      service: name={{ mongodb_svc }} enabled=yes
+    - command: "systemctl unmask mongodb"
+  when: ansible_distribution == 'Debian' or (ansible_distribution == 'Ubuntu' and ansible_lsb.major_release|int >= 16)
+
 - name: Ubuntu | Install mongodb
   apt: name={{item}} state=present update_cache=yes cache_valid_time=3600
   with_items:
     - mongodb-org
 
+## disappeared in mongodb3, https://docs.mongodb.com/manual/tutorial/rotate-log-files/
+#- name: set log rotation for mongodb
+#  lineinfile: dest=/etc/mongod.conf line="{{ item }}"
+#  with_items:
+#    - 'logpath=/var/log/mongodb/mongod.log'
+#    - 'logrotatesize=20M'
+#    - 'logrotatebackups=7'

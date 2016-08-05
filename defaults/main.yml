@@ -35,7 +35,7 @@ do_elk: false
 IDENT: mnemosyne
 CHANNELS: 'amun.events,conpot.events,thug.events,beeswarm.hive,dionaea.capture,dionaea.connections,thug.files,beeswarn.feeder,cuckoo.analysis,kippo.sessions,glastopf.events,glastopf.files,mwbinary.dionaea.sensorunique,snort.alerts,wordpot.events,p0f.events,suricata.events,shockpot.events,elastichoney.events'
 
-golang_v: 1.4.2
+golang_v: 1.6.3
 
 ### Client configuration
 #mhnmode: client

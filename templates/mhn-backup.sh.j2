@@ -1,12 +1,13 @@
 #!/bin/sh
 ## https://github.com/threatstream/mhn/wiki/Backing-Up-and-Restoring-MHN
 dst={{ backupdir }}/{{ ansible_fqdn }}
+date=`date +%Y-%m-%d`
 [ ! -d $dst ] && mkdir -p "$dst"
 
 supervisorctl stop all
 mongodump --db hpfeeds -o $dst/mongodump
 mongodump --db mnemosyne -o $dst/mongodump
-tar czf $dst/mhn-backup.tar.gz $dst/mongodump {{ MHN_HOME }}/server/mhn.db
+tar czf $dst/backup-$date-mhn-mongodump.tar.gz $dst/mongodump {{ MHN_HOME }}/server/mhn.db
 rm -R $dst/mongodump
 supervisorctl start all
 

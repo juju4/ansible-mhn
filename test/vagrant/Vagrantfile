@@ -1,0 +1,35 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+VAGRANTFILE_API_VERSION = "2"
+ENV['VAGRANT_DEFAULT_PROVIDER'] = 'virtualbox'
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+    #config.vm.box = "ubuntu/xenial64"
+    #config.vm.box = "boxcutter/ubuntu1604"
+    config.vm.box = "ubuntu/trusty64"
+    #config.vm.box = "centos/7"
+
+## http://askubuntu.com/questions/536875/error-in-installing-mongo-in-virtual-machine
+    ENV['LC_ALL']="en_US.UTF-8"
+    config.vm.provision :ansible do |ansible|
+       ansible.playbook = "site.yml"
+       #ansible.verbose = "vvvv"
+       #ansible.host_key_checking = false
+       #ansible.limit = 'all'
+       ansible.sudo = true
+       ansible.extra_vars = { ansible_ssh_user: 'vagrant' }
+       ansible.groups = {
+          "myrole" => ["mhn" ],
+       }
+    end
+
+    config.vm.define "mhn" do |mhn|
+        mhn.vm.hostname = "mhn"
+        mhn.vm.provider "virtualbox" do |v|
+          v.memory = 1024
+        end
+    end
+
+end
+

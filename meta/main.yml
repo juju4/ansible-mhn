@@ -24,5 +24,6 @@ galaxy_info:
     - networking
     - system
     - security
-dependencies: []
+dependencies:
+    - maxmind
 

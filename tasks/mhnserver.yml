@@ -35,6 +35,8 @@
 
 
 - file: path=/opt/www state=directory mode=755
+- name: MHN server | ensure pid directory for mhn user
+  file: path=/var/run/mhn state=directory mode=755 owner={{ mhn_user }}
 
 - template: src=default dest=/etc/nginx/sites-available/default mode=0644
   when: httpsport is undefined

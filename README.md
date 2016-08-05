@@ -3,6 +3,7 @@
 
 Mostly a conversion of the shell scripts of https://github.com/threatstream/mhn to ansible config
 https://github.com/threatstream/mhn/
+http://www.505forensics.com/honeypot-data-part-1-mongodb-elasticsearch-mhn/
 
 As stated in MHN FAQ, you need proper updates and hardening for those systems. (other roles)
 
@@ -95,6 +96,15 @@ $ Vagrant up node3
 $ ansible-playbook -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory site.yml --limit node3
 * DigitalOcean: 512MB box by default has no swap, add it or face Out of Memory killing especially on master server
 * idempotency: failing
+* mongodb can easily grow a lot depending on traffic.
+watch size of /var/lib/mongodb
+eventually delete content and reclaim space
+```
+# mongod --repair -f /etc/mongod.conf -vvvv
+```
+Note that "repairDatabase requires free disk space equal to the size of your current data set plus 2 gigabytes."
+https://docs.mongodb.com/manual/reference/command/repairDatabase/#using-repairdatabase-to-reclaim-disk-space
+
 
 ## FAQ
 

@@ -10,9 +10,11 @@
     - git
     - python-pip
     - sqlite3
+    - acl
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 - stat: path={{ MHN_HOME }}
   register: mhnrepo
+## Ansible 2.0 on xenial: https://docs.ansible.com/ansible/become.html#becoming-an-unprivileged-user
 - name: Clone MHN repository
   git:
     repo=https://github.com/threatstream/mhn.git
@@ -65,8 +67,8 @@
 - name: Update MHN_HOME in bashrc - mhn_user
   lineinfile:
     dest: "{{ mhn_userdir }}/.bashrc"
-    line: "^export MHN_HOME="
-    regexp: "export MHN_HOME={{ MHN_HOME }}"
+    regexp: "^export MHN_HOME="
+    line: "export MHN_HOME={{ MHN_HOME }}"
     insertafter: EOF
     state: present
     create: False

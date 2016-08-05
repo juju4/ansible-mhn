@@ -91,7 +91,8 @@
 #- file: src={{ item }} dest=/opt/ state=link
 #  with_fileglob:
 #    - /var/maxmind/*.dat
-- file: "src=/var/maxmind/{{ item }}.dat dest=/opt/{{ item }}.dat state=link"
+- name: symlink maxmind roles files where expected
+  file: "src=/var/maxmind/{{ item }}.dat dest=/opt/{{ item }}.dat state=link"
   with_items:
     - GeoLiteCity
     - GeoLiteCityv6
