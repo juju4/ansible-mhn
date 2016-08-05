@@ -10,7 +10,7 @@
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 - name: yum | Install mnemosyne dependencies
-  yum: name={{item}} state=present update_cache=yes cache_valid_time=3600
+  yum: name={{item}} state=present update_cache=yes
   with_items:
     - "@Development tools"
     - python-pip
