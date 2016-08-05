@@ -5,6 +5,7 @@
   with_items:
     - git
     - python-pip
+    - python-virtualenv
     - sqlite3
     - sudo
     - acl

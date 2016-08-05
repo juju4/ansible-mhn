@@ -104,6 +104,7 @@ eventually delete content and reclaim space
 ```
 Note that "repairDatabase requires free disk space equal to the size of your current data set plus 2 gigabytes."
 https://docs.mongodb.com/manual/reference/command/repairDatabase/#using-repairdatabase-to-reclaim-disk-space
+* Redhat/Centos support is under review. not working currently.
 
 
 ## FAQ
