@@ -1,5 +1,5 @@
 ---
-- name: Ubuntu | Install honeymap dependencies
+- name: apt | Install honeymap dependencies
   apt: name={{item}} state=present update_cache=yes cache_valid_time=3600
   with_items:
     - git
@@ -8,6 +8,18 @@
     - coffeescript
     - libgeoip-dev
     - supervisor
+
+- name: yum | Install honeymap dependencies
+  yum: name={{item}} state=present update_cache=yes cache_valid_time=3600
+  with_items:
+    - "@Development tools"
+    - git
+    - mercurial
+    - make
+    - coffee-script
+    - GeoIP-devel
+    - supervisor
+  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
 
 ## recent golang? 1.4.2
 ## alternative? https://launchpad.net/~evarlast/+archive/ubuntu/golang1.4

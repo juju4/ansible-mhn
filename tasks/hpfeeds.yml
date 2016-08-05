@@ -1,5 +1,5 @@
 ---
-- name: Ubuntu | Install hpfeeds dependencies
+- name: apt | Install hpfeeds dependencies
   apt: name={{item}} state=present update_cache=yes cache_valid_time=3600
   with_items:
     - libffi-dev
@@ -13,7 +13,20 @@
     - supervisor
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
-- name: Debian | install mongodb
+- name: yum | Install hpfeeds dependencies
+  yum: name={{item}} state=present update_cache=yes cache_valid_time=3600
+  with_items:
+    - "@Development tools"
+    - libffi-devel
+    - python-devel
+    - python-virtualenv
+    - git
+    - openssl-devel
+    - libev-devel
+    - supervisor
+  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+- name: install mongodb
   include: mongodb.yml
 
 - stat: path=/opt/hpfeeds
