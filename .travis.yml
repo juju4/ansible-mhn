@@ -61,6 +61,8 @@ before_install:
   - '[ "X${distribution}" == "Xcentos" -a "X${version}" == "X7" ] && sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- env http_proxy= rpm -iUvh http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-8.noarch.rpm" || true'
   - '[ "X${distribution}" == "Xcentos" ] && sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- env http_proxy= yum update" || true'
   - '[ "X${distribution}" == "Xcentos" ] && sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- env http_proxy= yum -y install python python-pip openssl-devel python-devel libffi-devel \"@Development tools\"" || true'
+## avoid "msg": "You (root) are not allowed to access to (crontab) because of pam configuration.\n" because of password expired in centos image
+  - '[ "X${distribution}" == "Xcentos" ] && sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- openssl passwd -in /dev/urandom | head -1" || true'
   - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- env http_proxy= pip install ansible"
   - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- ansible --version"
   - "echo localhost > inventory"

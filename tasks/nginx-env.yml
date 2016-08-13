@@ -1,0 +1,22 @@
+---
+
+- set_fact:
+    www_user: www-data
+    nginx_svc: nginx
+    nginx_confdir: /etc/nginx/conf.d
+    nginx_sitedir: /etc/nginx/sites-available
+    nginxconf: /etc/nginx/nginx.conf
+    nginxdefault: /etc/nginx/sites-available/default
+    nginxsslconf: /etc/nginx2/sites-available/default-ssl.conf
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- set_fact:
+    www_user: nginx
+    nginx_svc: nginx
+    nginx_confdir: /etc/nginx/default.d
+    nginx_sitedir: /etc/nginx/conf.d
+    nginxconf: /etc/nginx/nginx.conf
+    nginxdefault: /etc/nginx/nginx.conf
+    nginxsslconf:
+  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+

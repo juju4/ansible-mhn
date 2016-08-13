@@ -1,0 +1,11 @@
+---
+
+## https://bugzilla.redhat.com/show_bug.cgi?id=1020147
+## https://github.com/mitchellh/vagrant/issues/1482
+## blocking for any task using become_user:
+##      FAILED! => {"changed": false, "failed": true, "invocation": {"module_name": "git"}, "module_stderr": "sudo: sorry, you must have a tty to run sudo\n", "module_stdout": "", "msg": "MODULE FAILURE", "parsed": false}
+- name: RedHat | ensure sudo is installed
+  yum: name=sudo state=present
+- name: RedHat | disable requiretty in sudoers as it breaks things
+  replace: dest=/etc/sudoers regexp='^Defaults    requiretty' replace='#Defaults    requiretty' backup=yes
+
