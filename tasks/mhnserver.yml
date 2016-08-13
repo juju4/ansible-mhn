@@ -31,6 +31,11 @@
     - sqlite-devel
   when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
 
+## FIXME! xenial: https://github.com/unbit/uwsgi/issues/1262
+- name: fix bug uwsgi and xenial
+  replace: dest={{ MHN_HOME }}/server/requirements.txt regexp='^uWSGI.*' replace='uWSGI'
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'xenial'
+
 - name: Install mhnserver virtualenv
   pip: requirements={{ MHN_HOME }}/server/requirements.txt
     virtualenv={{ MHN_HOME }}/env       # path taken from existing scripts, if changed need to change other places
@@ -55,51 +60,47 @@
 - name: MHN server | ensure pid directory for mhn user
   file: path=/var/run/mhn state=directory mode=755 owner={{ mhn_user }}
 
-- template: src=default dest=/etc/nginx/sites-available/default mode=0644
+- block:
+    - name: MHN nginx configuration - http
+      template: src=default dest={{ nginx_sitedir }}/default mode=0644
+      when: httpsport is undefined
+      notify:
+        - nginx restart
+    - name: MHN | Debian - enable http configuration
+      file: src={{ nginx_sitedir }}/default dest=/etc/nginx/sites-enabled/default state=link
+      when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+      notify:
+        - nginx restart
   when: httpsport is undefined
-  notify:
-    - nginx restart
-- file: src=/etc/nginx/sites-available/default dest=/etc/nginx/sites-enabled/default state=link
-  when: httpsport is undefined
-  notify:
-    - nginx restart
-- stat: path=/etc/ssl/{{ ansible_fqdn }}.crt
-  register: localsslcert
+
+- block:
+    - stat: path={{ ssl_cert }}/{{ ansible_fqdn }}.crt
+      register: localsslcert
+
+    - name: Generale SSL certificate
+      command: openssl req -x509 -nodes -sha256 -days 1095 -newkey rsa:2048 -subj "{{ certinfo }}/CN={{ certificate_cn }}" -keyout {{ ssl_private }}/{{ ansible_fqdn }}.key -out {{ ssl_cert }}/{{ ansible_fqdn }}.crt
+      when: not localsslcert.stat.exists
+    - file: path={{ ssl_private }}/{{ ansible_fqdn }}.key owner=root group={{ ssl_group }} mode=0440
+    - name: MHN nginx configuration - https
+      template: src=default-ssl dest={{ nginx_sitedir }}/default-ssl mode=0644
+      notify:
+        - nginx restart
+    - name: remove nginx default configuration
+      file: path=/etc/nginx/sites-enabled/default state=absent
+      notify:
+        - nginx restart
+    - file: src={{ nginx_sitedir }}/default-ssl dest=/etc/nginx/sites-enabled/default-ssl state=link
+      when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+      notify:
+        - nginx restart
   when: httpsport is defined
 
-- set_fact:
-    certificate_cn: "{{ ansible_fqdn }}"
-## Travis error: "asn1 encoding routines:ASN1_mbstring_ncopy:string too longi:a_mbstr.c:154:maxsize=64" as cn=testing-gce-4d114f77-0ff1-41fb-bd33-22879d3249da.c.eco-emissary-99515.internal
-- command: "env"
-  register: env
-  changed_when: false
-- set_fact:
-    certificate_cn: "testing-travis.internal"
-  when: env.stdout.find('TRAVIS=true') != -1
-
-- name: Generale SSL certificate
-  command: openssl req -x509 -nodes -sha256 -days 1095 -newkey rsa:2048 -subj "{{ certinfo }}/CN={{ certificate_cn }}" -keyout /etc/ssl/private/{{ ansible_fqdn }}.key -out /etc/ssl/{{ ansible_fqdn }}.crt
-  when: not localsslcert.stat.exists and httpsport is defined
-- file: path=/etc/ssl/private/{{ ansible_fqdn }}.key owner=root group=ssl-cert mode=0440
-  when: httpsport is defined
-- template: src=default-ssl dest=/etc/nginx/sites-available/default-ssl mode=0644
-  when: httpsport is defined
-  notify:
-    - nginx restart
-- file: path=/etc/nginx/sites-enabled/default state=absent
-  when: httpsport is defined
-  notify:
-    - nginx restart
-- file: src=/etc/nginx/sites-available/default-ssl dest=/etc/nginx/sites-enabled/default-ssl state=link
-  when: httpsport is defined
-  notify:
-    - nginx restart
-
-- template: src={{ item }} dest=/etc/supervisor/conf.d/{{ item }} mode=0644
+- name: set mhnserver supervisor config
+  template: "src={{ item }}.conf dest={{ supervisor_confdir }}/{{ item }}.{{ supervisor_ext }} mode=0644"
   with_items:
-    - mhn-uwsgi.conf
-    - mhn-celery-worker.conf
-    - mhn-celery-beat.conf
+    - mhn-uwsgi
+    - mhn-celery-worker
+    - mhn-celery-beat
   notify:
     - supervisor update
 
@@ -118,26 +119,36 @@
 - file: path={{ MHN_HOME }}/.addusercollector state=touch
   when: not addusercollector.stat.exists
 
-- template: src={{ item }} dest=/etc/supervisor/conf.d/{{ item }} mode=0644
+- name: set mhn-collector supervisor config
+  template: "src={{ item }}.conf dest={{ supervisor_confdir }}/{{ item }}.{{ supervisor_ext }} mode=0644"
   with_items:
-    - mhn-collector.conf
+    - mhn-collector
   notify:
     - supervisor update
 
 - name: Make directory owned by www user
   file:
     path: "{{ MHN_HOME }}/server"
-    owner: www-data
-    group: www-data
+## FIXME! is it necessary? not idempotent with changes below
+#    owner: "{{ www_user }}"
+    group: "{{ www_user }}"
     recurse: yes
 
 - stat: path={{ MHN_HOME }}/server/mhn.log
   register: mhnlog
-- file: path={{ MHN_HOME }}/server/mhn.log state=touch mode=0644 owner=www-data group=www-data
+## log file and root dir must be accessible to www and mhn users(mhn-celery-beat)
+- name: ensure good permissions for {{ MHN_HOME }}/server/mhn.log
+  file: "path={{ MHN_HOME }}/server/mhn.log state=touch mode=0664 owner={{ mhn_user }} group={{ www_user }}"
   when: not mhnlog.stat.exists
+- name: ensure good permissions for {{ MHN_HOME }}/server/mhn.log
+  file: "path={{ MHN_HOME }}/server/mhn.log mode=0664 owner={{ mhn_user }} group={{ www_user }}"
+  when: mhnlog.stat.exists
 - file: src={{ MHN_HOME }}/server/mhn.log dest=/var/log/mhn/mhn.log state=link force=yes
+- name: ensure good permissions for {{ MHN_HOME }}/server
+  file: "path={{ MHN_HOME }}/server/mhn.db mode=0755 owner={{ mhn_user }} group={{ www_user }}"
 
-- service: name=nginx enabled=yes
+- name: MHN Server | ensure nginx service is enabled
+  service: name=nginx enabled=yes
 
 ## check everything fine ?
 #sudo supervisorctl status

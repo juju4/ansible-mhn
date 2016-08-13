@@ -1,4 +1,5 @@
 ---
+
 - name: apt | Install mnemosyne dependencies
   apt: name={{item}} state=present update_cache=yes cache_valid_time=3600
   with_items:
@@ -31,6 +32,10 @@
     dest=/opt/mnemosyne
   when: not gitmnemosyne.stat.exists
 
+## FIXME! https://github.com/gevent/gevent/issues/513
+- name: fix PROTOCOL_SSLv3 error in gevent
+  replace: dest=/opt/mnemosyne/requirements.txt regexp='^gevent==.*' replace='gevent>=1.0.2'
+
 ## FIXME! seems to be run/changed each time?
 ## https://github.com/ansible/ansible/issues/6191
 - name: Install mnemosyne virtualenv
@@ -57,7 +62,8 @@
 
 - file: path=/var/log/mhn state=directory mode=755
 
-- copy: src=mnemosyne.conf dest=/etc/supervisor/conf.d/mnemosyne.conf mode=0644
+- name: set mnemosyne supervisor config
+  copy: "src=mnemosyne.conf dest={{ supervisor_confdir }}/mnemosyne.{{ supervisor_ext }} mode=0644"
   notify:
     - supervisor update
 

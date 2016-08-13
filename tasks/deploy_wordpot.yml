@@ -23,8 +23,19 @@
   apt: name={{item}} state=present update_cache=yes cache_valid_time=3600
   with_items:
     - git
+    - supervisor
     - python-pip
     - python-virtualenv
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: yum | Install wordpot dependencies
+  yum: name={{item}} state=present update_cache=yes
+  with_items:
+    - git
+    - supervisor
+    - python-pip
+    - python-virtualenv
+  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
 
 - stat: path=/opt/wordpot
   register: wordpotdir
@@ -43,7 +54,8 @@
     - { regexp: 'HPFEEDS_.*', replace: '' }
     - { regexp: '^HOST\s.*', replace: "HOST = '0.0.0.0'" }
 
-- lineinfile: "dest=/opt/wordpot/wordpot.conf regexp='{{ item.regexp }}' line='{{ item.line }}'"
+- name: update wordport config
+  lineinfile: "dest=/opt/wordpot/wordpot.conf regexp='{{ item.regexp }}' line='{{ item.line }}'"
   with_items:
     - { regexp: '^HPFEEDS_ENABLED = True', line: 'HPFEEDS_ENABLED = True' }
     - { regexp: "^HPFEEDS_HOST = '{{ HPF_HOST.stdout }}'", line: "HPFEEDS_HOST = '{{ HPF_HOST.stdout }}'" }
@@ -53,7 +65,8 @@
     - { regexp: "^HPFEEDS_TOPIC = 'wordpot.events'", line: "HPFEEDS_TOPIC = 'wordpot.events'" }
 
 
-- copy: src=wordpot.conf dest=/etc/supervisor/conf.d/wordpot.conf mode=0644
+- name: MHN client | wordpot - supervisor config
+  copy: "src=wordpot.conf dest={{ supervisor_confdir }}/wordpot.{{ supervisor_ext }} mode=0644"
   notify:
     - supervisor update
 

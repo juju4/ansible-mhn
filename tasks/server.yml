@@ -3,6 +3,8 @@
   user: "name={{ mhn_user }} home={{ mhn_userdir }}"
   become: yes
 
+- include: nginx-env.yml
+
 - name: Include version-specific variables for Ubuntu.
   include_vars: "{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml"
   when: ansible_distribution == 'Ubuntu'
@@ -53,7 +55,11 @@
     - "{{ scriptsdir }}"
 - name: setup backup configuration
   template: "src=mhn-backup.sh.j2 dest={{ scriptsdir }}/mhn-backup.sh mode=0755"
-- cron: name="mhn-backup" minute="30" hour="3" weekday="0" job="{{ scriptsdir }}/mhn-backup.sh > /dev/null 2>&1"
+- name: setup cron backup
+  cron: name="mhn-backup" minute="30" hour="3" weekday="0"
+    job="{{ scriptsdir }}/mhn-backup.sh > /dev/null 2>&1"
+    user=root
+    cron_file=ansible_mhn-backup
 
 - name: Update MHN_HOME in bashrc - root
   lineinfile:
@@ -84,4 +90,6 @@
 - name: add some nrpe commands for monitoring
   copy: src=mhn-nrpe.cfg dest=/etc/nagios/nrpe.d/mhn-nrpe.cfg mode=0644
 
+- name: ensure supervisor service is enabled
+  service: name={{ supervisor_service }} enabled=yes
 

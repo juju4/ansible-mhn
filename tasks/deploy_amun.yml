@@ -22,6 +22,15 @@
     - git
     - supervisor
     - python-pip
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: yum | Install amun dependencies
+  yum: name={{item}} state=present update_cache=yes
+  with_items:
+    - git
+    - supervisor
+    - python-pip
+  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
 
 - stat: path=/opt/amun
   register: amundir
@@ -48,7 +57,8 @@
 
 - template: src=log-hpfeeds.conf dest=/opt/amun/conf/log-hpfeeds.conf mode=0644
 
-- template: src=amun.conf dest=/etc/supervisor/conf.d/amun.conf mode=0644
+- name: set amun supervisor config
+  template: "src=amun.conf dest={{ supervisor_confdir }}/amun.{{ supervisor_ext }} mode=0644"
   notify:
     - supervisor update
 

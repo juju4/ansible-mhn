@@ -23,6 +23,7 @@ server_url: "https://10.254.254.100:{{ httpsport }}"
 ## if self-signed certificate
 #curl_arg: ''
 curl_arg: '-k'
+mnemosyne_ignore_rfc1918: False
 
 do_splunk: false
 do_arcsight: false

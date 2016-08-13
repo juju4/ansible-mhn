@@ -22,6 +22,15 @@
     - git
     - golang
     - supervisor
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: yum | Install elastichoney dependencies
+  yum: name={{item}} state=present update_cache=yes
+  with_items:
+    - git
+    - supervisor
+    - golang-bin
+  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
 
 - stat: path=/opt/elastichoney
   register: elastichoneydir
@@ -46,8 +55,8 @@
 - name: set up elastichoney json config
   template: src=elastichoney-config.json dest=/opt/elastichoney/config.json mode=0644 backup=yes
 
-- name: set up elastichoney supervisor config
-  copy: src=elastichoney.conf dest=/etc/supervisor/conf.d/elastichoney.conf mode=0644 backup=yes
+- name: set elastichoney supervisor config
+  copy: "src=elastichoney.conf dest={{ supervisor_confdir }}/elastichoney.{{ supervisor_ext }} mode=0644"
   notify:
     - supervisor update
 

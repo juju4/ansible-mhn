@@ -1,6 +1,7 @@
 ---
 
 - include: redhat-epel.yml
+- include: redhat-sudotty.yml
 
 - name: yum | Install MHN server dependencies
   yum: name={{item}} state=present
@@ -11,4 +12,13 @@
     - sqlite
     - sudo
     - acl
+    - supervisor
+
+- set_fact:
+    supervisor_confdir: /etc/supervisord.d
+    supervisor_ext: ini
+    supervisor_service: supervisord
+    ssl_cert: /etc/pki/tls/certs
+    ssl_private: /etc/pki/tls/private
+    ssl_group: root
 

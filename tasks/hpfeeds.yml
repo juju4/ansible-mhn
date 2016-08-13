@@ -1,4 +1,5 @@
 ---
+
 - name: apt | Install hpfeeds dependencies
   apt: name={{item}} state=present update_cache=yes cache_valid_time=3600
   with_items:
@@ -50,7 +51,8 @@
 
 - file: path=/var/log/mhn state=directory mode=755
 
-- copy: src=hpfeeds-broker.conf dest=/etc/supervisor/conf.d/hpfeeds-broker.conf mode=0644
+- name: set hpfeeds supervisor config
+  copy: "src=hpfeeds-broker.conf dest={{ supervisor_confdir }}/hpfeeds-broker.{{ supervisor_ext }} mode=0644"
   notify:
     - supervisor update
 

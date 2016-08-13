@@ -44,6 +44,35 @@
     - libxslt-dev
     - supervisor
     - python-pip
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: yum | Install glastopf dependencies
+  yum: name={{item}} state=present update_cache=yes
+  with_items:
+    - git
+    - supervisor
+    - python-pip
+    - python-devel
+    - python-gevent
+    - libevent-devel
+    - "@Development tools"
+    - make
+    - python-chardet
+    - python-requests
+    - python-sqlalchemy
+    - python-lxml
+    - python-BeautifulSoup
+    - mongodb
+    - php
+    - php-devel
+    - lapack-devel
+    - gcc-gfortran
+    - mariadb-devel
+    - libxml2-devel
+    - libxslt-devel
+## FIXME! rpm missing?
+#    - python-openssl
+  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
 
 ## Note: may conflict w release for other modules: contop, snort
 - stat: path=/usr/local/lib/python2.7/dist-packages/distribute-0.6.35-py2.7.egg
@@ -90,7 +119,8 @@
 
 - template: src=glastopf.cfg dest=/opt/glastopf/glastopf.cfg mode=0644
 
-- template: src=glastopf.conf dest=/etc/supervisor/conf.d/glastopf.conf mode=0644
+- name: set glastopf supervisor config
+  template: "src=glastopf.conf dest={{ supervisor_confdir }}/glastopf.{{ supervisor_ext }} mode=0644"
   notify:
     - supervisor update
 

@@ -16,37 +16,44 @@
   register: HPF_SECRET
   changed_when: False
 
-- name: Ubuntu | Install dionaea dependencies
-  apt: name={{item}} state=present update_cache=yes cache_valid_time=3600
+- block:
+    - name: apt | Install dionaea dependencies
+      apt: name={{item}} state=present update_cache=yes cache_valid_time=3600
+      with_items:
+        - python-software-properties
+        - git
+        - supervisor
+        - patch
+
+    - name: Ubuntu | Add honeynet nightly ppa
+      apt_repository: repo='ppa:honeynet/nightly'
+      when: ansible_distribution == 'Ubuntu'
+
+    - name: Ubuntu | Install dionaea - precise
+      apt: name=dionaea state=present update_cache=yes
+      when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'precise'
+    - name: Ubuntu | Install dionaea - trusty
+      apt: name=dionaea-phibo state=present update_cache=yes
+      when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'trusty'
+    - name: Ubuntu | Install dionaea - xenial
+      fail: msg="honeynet ppa has no xenial built currently."
+      when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'xenial'
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: yum | Install dionaea dependencies
+  yum: name={{item}} state=present update_cache=yes
   with_items:
-    - python-software-properties
     - git
     - supervisor
     - patch
-
-- apt_repository: repo='ppa:honeynet/nightly'
-
-- name: Ubuntu | Install dionaea
-  apt: name={{item}} state=present update_cache=yes
-  with_items:
-    - dionaea-phibo
-  when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'trusty'
-- name: Ubuntu | Install dionaea
-  apt: name={{item}} state=present update_cache=yes
-  with_items:
-    - dionaea
-  when: ansible_distribution == 'Ubuntu' and ansible_distribution_release != 'trusty'
+## FIXME! rpm not available
+#    - dionaea
+  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
 
 - template: src=dionaea.hpfeeds.patch dest=/tmp/dionaea.hpfeeds.patch mode=0644
 
 - copy: src=hpfeeds.py dest=/usr/lib/dionaea/python/dionaea/hpfeeds.py mode=0755
 
-- stat: path=/etc/dionaea/dionaea.conf.0
-  register: dbkp
-- command: "cp /etc/dionaea/dionaea.conf /etc/dionaea/dionaea.conf.0"
-  when: not dbkp.stat.exists
-- stat: path=/root/.dionaea_patch
-  register: dp
 ## remote_src needed else doing from master: fatal: [node1] => input file not found at /tmp/dionaea.hpfeeds.patch or /tmp/dionaea.hpfeeds.patch
 - name: apply patch dionaea.hpfeeds.patch
   patch: >
@@ -54,9 +61,7 @@
     basedir=/
     strip=0
     remote_src=True
-  when: not dp.stat.exists
-- file: path=/root/.dionaea_patch state=touch
-  when: not dp.stat.exists
+    backup=yes
 
 - file: "path={{ item }} state=directory mode=0755"
   with_items:
@@ -81,7 +86,8 @@
     - { regexp: 'mode = "getifaddrs"', replace: 'mode = "manual"' }
     - { regexp: 'addrs = { eth0 = \["::"\] }', replace: 'addrs = { eth0 = ["::", "0.0.0.0"] }' }
 
-- copy: src=dionaea.conf dest=/etc/supervisor/conf.d/dionaea.conf mode=0644
+- name: set dionaea supervisor config
+  copy: "src=dionaea.conf dest={{ supervisor_confdir }}/dionaea.{{ supervisor_ext }} mode=0644"
   notify:
     - supervisor update
 

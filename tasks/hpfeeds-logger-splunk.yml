@@ -9,6 +9,18 @@
     - libgeoip-dev
     - python-virtualenv
     - supervisor
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: yum | Install hpfeeds-logger-splunk dependencies
+  yum: name={{item}} state=present update_cache=yes
+  with_items:
+    - git
+    - python-pip
+    - python-virtualenv
+    - supervisor
+    - GeoIP-devel
+  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
 
 - name: Install hpfeeds-logger-splunk virtualenv
   pip: name="{{ item }}"

@@ -30,6 +30,24 @@
     - zlib1g-dev
     - python-virtualenv
     - supervisor
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: yum | Install conpot dependencies
+  yum: name={{item}} state=present update_cache=yes
+  with_items:
+    - git
+    - supervisor
+    - python-pip
+    - python-devel
+    - python-virtualenv
+    - libxml2-devel
+    - libxslt-devel
+    - mariadb-devel
+    - zlib-devel
+## FIXME! rpm not available
+#    - libsmi2ldbl
+#    - snmp-mibs-downloader
+  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
 
 - pip: name="{{ item }}"
   with_items:
@@ -46,7 +64,8 @@
 
 - template: src=conpot.cfg dest=/opt/conpot/conpot.cfg mode=0644
 
-- copy: src=conpot.conf dest=/etc/supervisor/conf.d/conpot.conf mode=0644
+- name: set conpot supervisor config
+  copy: "src=conpot.conf dest={{ supervisor_confdir }}/conpot.{{ supervisor_ext }} mode=0644"
   notify:
     - supervisor update
 

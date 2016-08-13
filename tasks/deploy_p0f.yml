@@ -24,6 +24,18 @@
     - libpcap-dev
     - libjansson-dev
     - gcc
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: yum | Install p0f dependencies
+  yum: name={{item}} state=present update_cache=yes
+  with_items:
+    - git
+    - supervisor
+    - supervisor
+    - libpcap-devel
+    - jansson-devel
+    - "@Development tools"
+  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
 
 - stat: path=/opt/p0f
   register: p0fdir
@@ -44,7 +56,8 @@
 
 - file: path=/var/empty/p0f state=directory mode=0755
 
-- template: src=p0f.conf dest=/etc/supervisor/conf.d/p0f.conf mode=0644
+- name: set p0f supervisor config
+  template: "src=p0f.conf dest={{ supervisor_confdir }}/p0f.{{ supervisor_ext }} mode=0644"
   notify:
     - supervisor update
 

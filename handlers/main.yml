@@ -1,7 +1,9 @@
 ---
+
 - name: supervisor update
-  service: name=supervisor state=restarted sleep=5
+  service: name={{ supervisor_service }} state=restarted sleep=5
 - name: nginx restart
   service: name=nginx state=restarted
 - name: restart ssh
   service: name=ssh state=restarted
+

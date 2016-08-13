@@ -10,3 +10,11 @@
     - sudo
     - acl
 
+- set_fact:
+    supervisor_confdir: /etc/supervisor/conf.d
+    supervisor_ext: conf
+    supervisor_service: supervisor
+    ssl_cert: /etc/ssl
+    ssl_private: /etc/ssl/private
+    ssl_group: ssl-cert
+

@@ -1,16 +1,18 @@
 ---
 
 ## some packages need multiverse like snmp-mibs-downloader
-- apt_repository: repo="{{item}}"
+- name: Ubuntu | ensure multiverse repo are enabled
+  apt_repository: repo="{{item}}"
   register: multiverse_installed
-  when: ansible_distribution == 'Ubuntu'
   with_items:
     - 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}} multiverse'
     - 'deb-src http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}} multiverse'
     - 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-updates multiverse'
     - 'deb-src http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-updates multiverse'
+  when: ansible_distribution == 'Ubuntu'
 
-- apt: update_cache=yes cache_valid_time=3600
+- name: Ubuntu | update apt cache
+  apt: update_cache=yes cache_valid_time=3600
   when: multiverse_installed | changed
 
 ## check no issue but not idempotent...

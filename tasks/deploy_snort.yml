@@ -41,6 +41,30 @@
     - python-virtualenv
     - libev-dev
     - libev4
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: yum | Install snort dependencies
+  yum: name={{item}} state=present update_cache=yes
+  with_items:
+    - git
+    - supervisor
+    - "@Development tools"
+    - libpcap-devel
+    - jansson-devel
+    - pcre-devel
+    - libdnet-devel
+    - flex
+    - bison
+    - make
+    - zlib-devel
+    - libev
+    - libev-devel
+    - python-pip
+    - python-virtualenv
+## FIXME! missing rpm
+#    - libdumbnet-dev
+#    - libdaq-dev
+  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
 
 ## former is needed if older release present (conpot)
 #- command: "pip install --upgrade distribute"
@@ -140,7 +164,7 @@
 - file: src=/opt/mhn/rules/mhn.rules path=/opt/snort/rules/local.rules state=link force=yes
 
 - name: MHN client | snort - supervisor config
-  template: src=snort.conf dest=/etc/supervisor/conf.d/snort.conf mode=0644
+  template: "src=snort.conf dest={{ supervisor_confdir }}/snort.{{ supervisor_ext }} mode=0644"
   notify:
     - supervisor update
 

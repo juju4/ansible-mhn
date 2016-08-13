@@ -24,7 +24,8 @@
 ## http://askubuntu.com/questions/757384/can-i-use-14-04-mongodb-packages-with-16-04
     - name: enable service mongodb
       service: name={{ mongodb_svc }} enabled=yes
-    - command: "systemctl unmask mongodb"
+#    - name: unmask mongodb from systemctl
+#      command: "systemctl unmask mongodb"
   when: ansible_distribution == 'Debian' or (ansible_distribution == 'Ubuntu' and ansible_lsb.major_release|int >= 16)
 
 ## https://docs.mongodb.com/manual/tutorial/install-mongodb-on-red-hat/

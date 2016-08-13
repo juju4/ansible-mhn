@@ -23,6 +23,16 @@
     - python-pip
     - supervisor
     - python-virtualenv
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: yum | Install shockpot dependencies
+  yum: name={{item}} state=present update_cache=yes
+  with_items:
+    - git
+    - supervisor
+    - python-pip
+    - python-virtualenv
+  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
 
 - stat: path=/opt/shockpot
   register: shockpotdir
@@ -38,7 +48,8 @@
 
 - template: src=shockpot.conf dest=/opt/shockpot/shockpot.conf mode=0644
 
-- template: src=shockpot.conf dest=/etc/supervisor/conf.d/shockpot.conf mode=0644
+- name: set shockpot supervisor config
+  template: "src=shockpot.conf dest={{ supervisor_confdir }}/shockpot.{{ supervisor_ext }} mode=0644"
   notify:
     - supervisor update
 

@@ -16,7 +16,7 @@
   register: HPF_SECRET
   changed_when: False
 
-- name: Ubuntu | Install mhnserver dependencies
+- name: Ubuntu | Install kippo dependencies
   apt: name={{item}} state=present update_cache=yes cache_valid_time=3600
   with_items:
     - python-dev
@@ -29,6 +29,25 @@
     - supervisor
     - authbind
     - iptables-persistent
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: yum | Install kippo dependencies
+  yum: name={{item}} state=present update_cache=yes
+  with_items:
+    - git
+    - supervisor
+    - python-pip
+    - python-devel
+    - openssl-devel
+    - python-pyasn1
+    - python-twisted-web
+    - iptables
+## FIXME! rpm missing
+#    - python-openssl
+#    - authbind
+#    - iptables-persistent
+  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
 
 - name: Kippo | ensure no conflict with main ssh server = could break your config if using Vagrant
   lineinfile:
@@ -72,7 +91,8 @@
 
 - template: src=start.sh dest=/opt/kippo/start.sh mode=0755
 
-- template: src=kippo.conf dest=/etc/supervisor/conf.d/kippo.conf mode=0644
+- name: set kippo supervisor config
+  template: "src=kippo.conf dest={{ supervisor_confdir }}/kippo.{{ supervisor_ext }} mode=0644"
   notify:
     - supervisor update
 

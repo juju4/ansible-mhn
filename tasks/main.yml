@@ -1,4 +1,8 @@
 ---
+
+- include: travis.yml
+#- include: root-password-expired.yml
+
 - name: Install MHN Server
   include: server.yml
   when: mhnmode == 'server'
@@ -15,3 +19,4 @@
 - name: Reboot the server
   command: /sbin/reboot
   when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and file.stat.exists == true and (noreboot is not defined and not noreboot)
+
