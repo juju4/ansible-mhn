@@ -26,4 +26,5 @@ galaxy_info:
     - security
 dependencies:
     - maxmind
+    - redhat-epel
 

@@ -48,6 +48,9 @@ end
 describe file('/etc/supervisor/conf.d/mnemosyne.conf') do
   it { should be_file }
 end
+describe file('/tmp/uwsgi.sock') do
+  it { should be_socket }
+end
 
 describe command('supervisorctl status') do
   its(:stdout) { should_not match /FATAL/ }

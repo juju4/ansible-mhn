@@ -27,6 +27,7 @@ before_install:
 ## use appropriate role path and not github name
   - ln -s ansible-mhn ../mhn && cd ../mhn
   - git clone https://github.com/juju4/ansible-maxmind ../maxmind
+  - git clone https://github.com/juju4/ansible-redhat-epel ../redhat-epel
 ## No Xenial, https://github.com/travis-ci/travis-ci/issues/5821
 #  - sudo apt install lxd
   - echo "deb http://archive.ubuntu.com/ubuntu trusty-backports main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/trusty-backports.list
@@ -42,7 +43,7 @@ before_install:
   - 'sudo -E su $USER -c "[ ${distribution} == ubuntu ] || lxc image copy images:/${distribution}/${version}/amd64 local: --alias=${distribution}-${version}"'
   - 'sudo -E su $USER -c "[ ${distribution} == ubuntu ] && lxc image copy ubuntu:${version} local: --alias=${distribution}-${version}" || true'
 ## configure lxd-bridge
-  - sudo perl -pi -e 's@^LXD_IPV4_ADDR=""@LXD_IPV4_ADDR="10.252.116.1"@;s@^LXD_IPV4_NETMASK=""@LXD_IPV4_NETMASK="255.255.255.0"@;s@^LXD_IPV4_NETWORK=""@LXD_IPV4_NETWORK="10.252.116.1/24"@;s@^LXD_IPV4_DHCP_RANGE=""@LXD_IPV4_DHCP_RANGE="10.252.116.2,10.252.116.254"@;s@^LXD_IPV4_DHCP_MAX=""@LXD_IPV4_DHCP_MAX="252"@;' /etc/default/lxd-bridge
+  - sudo perl -pi -e 's@^LXD_IPV4_ADDR=""@LXD_IPV4_ADDR="10.252.116.1"@;s@^LXD_IPV4_NETMASK=""@LXD_IPV4_NETMASK="255.255.255.0"@;s@^LXD_IPV4_NETWORK=""@LXD_IPV4_NETWORK="10.252.116.1/24"@;s@^LXD_IPV4_DHCP_RANGE=""@LXD_IPV4_DHCP_RANGE="10.252.116.2,10.252.116.254"@;s@^LXD_IPV4_DHCP_MAX=""@LXD_IPV4_DHCP_MAX="252"@;s@LXD_IPV6_PROXY="true"@LXD_IPV6_PROXY="false"@' /etc/default/lxd-bridge
 #  - cat /etc/default/lxd-bridge
 #  - service --status-all
   - sudo service lxd restart
@@ -55,15 +56,15 @@ before_install:
   - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- env"
   - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- dhclient eth0"
   - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- ping -c 1 8.8.8.8"
-  - '[ "X${distribution}" == "Xubuntu" ] && sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- env http_proxy= apt-get update" || true'
-  - '[ "X${distribution}" == "Xubuntu" ] && sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- env http_proxy= apt-get -y install python python-apt aptitude python-pip libssl-dev python-dev libffi-dev" || true'
-  - '[ "X${distribution}" == "Xcentos" -a "X${version}" == "X6" ] && sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- env http_proxy= rpm -iUvh http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm" || true'
-  - '[ "X${distribution}" == "Xcentos" -a "X${version}" == "X7" ] && sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- env http_proxy= rpm -iUvh http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-8.noarch.rpm" || true'
-  - '[ "X${distribution}" == "Xcentos" ] && sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- env http_proxy= yum update" || true'
-  - '[ "X${distribution}" == "Xcentos" ] && sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- env http_proxy= yum -y install python python-pip openssl-devel python-devel libffi-devel \"@Development tools\"" || true'
+  - '[ "X${distribution}" == "Xubuntu" ] && sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- apt-get update" || true'
+  - '[ "X${distribution}" == "Xubuntu" ] && sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- apt-get -y install python python-apt aptitude python-pip libssl-dev python-dev libffi-dev" || true'
+  - '[ "X${distribution}" == "Xcentos" -a "X${version}" == "X6" ] && sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- rpm -iUvh http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm" || true'
+  - '[ "X${distribution}" == "Xcentos" -a "X${version}" == "X7" ] && sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- rpm -iUvh http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-8.noarch.rpm" || true'
+  - '[ "X${distribution}" == "Xcentos" ] && sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- yum update" || true'
+  - '[ "X${distribution}" == "Xcentos" ] && sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- yum -y install python python-pip openssl-devel python-devel libffi-devel \"@Development tools\"" || true'
 ## avoid "msg": "You (root) are not allowed to access to (crontab) because of pam configuration.\n" because of password expired in centos image
   - '[ "X${distribution}" == "Xcentos" ] && openssl passwd -in /dev/urandom | sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- passwd root --stdin" || true'
-  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- env http_proxy= pip install ansible"
+  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- pip install ansible"
   - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- ansible --version"
   - "echo localhost > inventory"
 ## enable ansible profiling (https://github.com/jlafon/ansible-profile)
@@ -85,10 +86,10 @@ before_install:
 
 script:
   - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- ansible-playbook -i inventory --syntax-check /etc/ansible/roles/mhn/test/integration/default/default.yml"
-  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- env http_proxy= ansible-playbook -i inventory --connection=local --sudo -vvvv /etc/ansible/roles/mhn/test/integration/default/default.yml"
+  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- ansible-playbook -i inventory --connection=local --sudo -vvvv /etc/ansible/roles/mhn/test/integration/default/default.yml"
 ## FIXME! Travis request: Build config file had a parse error: "mapping values are not allowed in this context at line 72 column 321".
-#  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- env http_proxy= ansible-playbook -i inventory /etc/ansible/roles/mhn/test/integration/default/default.yml --connection=local --sudo | tee /tmp/idempotency.log | grep -q 'changed=0.*failed=0'  && (echo 'Idempotence test: pass' && exit 0) || (echo 'Idempotence test: fail' && cat /tmp/idempotency.log && exit 1)"
-  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- time env http_proxy= sh -x /etc/ansible/roles/mhn/test/integration/default/serverspec/run-local-tests.sh"
+#  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- ansible-playbook -i inventory /etc/ansible/roles/mhn/test/integration/default/default.yml --connection=local --sudo | tee /tmp/idempotency.log | grep -q 'changed=0.*failed=0'  && (echo 'Idempotence test: pass' && exit 0) || (echo 'Idempotence test: fail' && cat /tmp/idempotency.log && exit 1)"
+  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- time sh -x /etc/ansible/roles/mhn/test/integration/default/serverspec/run-local-tests.sh"
   - sudo -E su $USER -c "lxc stop run-${distribution}-${version//./}"
 
 notifications:

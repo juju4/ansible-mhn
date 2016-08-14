@@ -1,6 +1,5 @@
 ---
 
-- include: redhat-epel.yml
 - include: redhat-sudotty.yml
 
 - name: yum | Install MHN server dependencies
