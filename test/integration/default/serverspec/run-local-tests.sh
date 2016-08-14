@@ -30,3 +30,8 @@ else
     bash -l -c "bundle exec rake spec"
 fi
 
+systemctl status supervisor --no-pager
+ps axu | grep supervisor
+[ X`which journalctl` != 'X' ] && journalctl -xe --no-pager
+apt-get -f -y install
+
