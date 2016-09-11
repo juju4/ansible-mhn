@@ -3,13 +3,20 @@
 - include: travis.yml
 #- include: root-password-expired.yml
 
+- name: Include version-specific variables for Ubuntu.
+  include_vars: "{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml"
+  when: ansible_distribution == 'Ubuntu'
+- name: Include version-specific variables for RedHat
+  include_vars: "RedHat-{{ ansible_distribution_version.split('.')[0] }}.yml"
+  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
 - name: Install MHN Server
   include: server.yml
-  when: mhnmode == 'server'
+#  when: mhnmode == 'server'
 
-- name: Install MHN Client
-  include: client.yml
-  when: mhnmode == 'client'
+#- name: Install MHN Client
+#  include: client.yml
+#  when: mhnmode == 'client'
 
 - name: Debian | Check if a reboot is required
   register: file

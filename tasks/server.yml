@@ -1,13 +1,11 @@
 ---
+
 - name: check role user exists
   user: "name={{ mhn_user }} home={{ mhn_userdir }}"
   become: yes
 
-- include: nginx-env.yml
-
-- name: Include version-specific variables for Ubuntu.
-  include_vars: "{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml"
-  when: ansible_distribution == 'Ubuntu'
+- name: ensure traversal permissions on mhn userdir
+  file: dest={{ mhn_userdir }} mode=0711
 
 - include: debian.yml
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
@@ -44,9 +42,12 @@
 - include: elk.yml
   when: do_elk is defined and do_elk
 
-- file: dest=/etc/aide/aide.conf.d state=directory mode=0755
-- name: add additional aide HIDS configuration
-  copy: src=99_aide_local_mhn dest=/etc/aide/aide.conf.d/99_aide_local_mhn mode=0644
+- block:
+    - file: dest=/etc/aide/aide.conf.d state=directory mode=0755
+    - name: add additional aide HIDS configuration
+      copy: src=99_aide_local_mhn dest=/etc/aide/aide.conf.d/99_aide_local_mhn mode=0644
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
 
 - name: Common directories
   file: "dest={{ item }} mode=0755 state=directory"

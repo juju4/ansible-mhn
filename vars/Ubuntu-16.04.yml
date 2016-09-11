@@ -1,2 +1,35 @@
 ---
 
+mhnserver_pkg:
+    - build-essential
+    - python-pip
+    - python-dev
+    - git
+    - redis-server
+    - libgeoip-dev
+    - python-virtualenv
+    - nginx
+    - supervisor
+    - ssl-cert
+    - libsqlite3-dev
+
+mhnserver_services:
+    - nginx
+    - redis-server
+    - supervisor
+
+www_user: www-data
+nginx_svc: nginx
+nginx_confdir: /etc/nginx/conf.d
+nginx_sitedir: /etc/nginx/sites-available
+nginxconf: /etc/nginx/nginx.conf
+nginxdefault: /etc/nginx/sites-available/default
+nginxsslconf: /etc/nginx2/sites-available/default-ssl.conf
+
+supervisor_confdir: /etc/supervisor/conf.d
+supervisor_ext: conf
+supervisor_service: supervisor
+ssl_cert: /etc/ssl
+ssl_private: /etc/ssl/private
+ssl_group: ssl-cert
+

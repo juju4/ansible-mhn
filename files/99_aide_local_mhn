@@ -5,18 +5,19 @@
 /var/lib/mongodb/journal/lsn$ VarFile
 /var/log/mhn$ VarDir
 /var/mhn/server$ VarDir
-/var/mhn/server/mhn.log*$ VarFile
+/var/mhn/server/mhn\.log(\.[0-9]+)?$ LowLog
+/var/mhn/server/mhn\.log\.1\.gz$ LoSerMemberLog
+/var/mhn/server/mhn\.log\.[2-5]\.gz$ SerMemberLog
+/var/mhn/server/mhn\.log\.6\.gz$ HiSerMemberLog
+/var/lib/redis$ VarDirTime
+/var/lib/redis/dump.rdb$ OwnerMode
+var/mhn/server/celerybeat-schedule$ InodeData
+/var/mhn/server/celerybeat.pid$ InodeData
+/var/mhn/server/mhn/static/mhn.rules$ InodeData
 ## node
 !/opt/glastopf/data/dork_pages
 /opt/glastopf/db/glastopf.db$ VarFile
 /opt/glastopf/log/glastopf.log$ VarFile
-/tmp/update_maxmind.log$ VarFile
-/var/maxmind/GeoIP.dat.gz$ VarFile
-/var/maxmind/GeoIPASNum.dat.gz$ VarFile
-/var/maxmind/GeoIPASNumv6.dat.gz$ VarFile
-/var/maxmind/GeoIPv6.dat.gz$ VarFile
-/var/maxmind/GeoLiteCity.dat.gz$ VarFile
-/var/maxmind/GeoLiteCityv6.dat.gz$ VarFile
 /opt/bro/logs$ VarDir
 !/opt/bro/spool/tmp
 !/opt/bro/spool/bro

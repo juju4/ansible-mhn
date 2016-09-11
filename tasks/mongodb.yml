@@ -55,3 +55,13 @@
 #    - 'logpath=/var/log/mongodb/mongod.log'
 #    - 'logrotatesize=20M'
 #    - 'logrotatebackups=7'
+
+- stat: path=/var/lib/mongodb
+  register: mongodblib
+- block:
+    - name: ensure appropriate permissions for /var/lib/mongodb
+      file: dest={{ item }} owner=mongodb
+      with_fileglob:
+        - /var/lib/mongodb/*
+  when: mongodblib.stat.exists
+

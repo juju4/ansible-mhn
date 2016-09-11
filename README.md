@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/juju4/ansible-mhn.svg?branch=master)](https://travis-ci.org/juju4/ansible-mhn)
-# MHN Server and Clients ansible roles
+# MHN Server ansible role
 
 Mostly a conversion of the shell scripts of https://github.com/threatstream/mhn to ansible config
 https://github.com/threatstream/mhn/
@@ -11,14 +11,12 @@ As stated in MHN FAQ, you need proper updates and hardening for those systems. (
 
 ### Ansible
 It was tested on the following versions:
- * 1.9.2
  * 2.0
  * 2.1
 
 ### Operating systems
 
-Tested with vagrant+ansible or ansible on Ubuntu Trusty for now but should work on any debian based systems at a few exception (dionaea is using honeynet ppa).
-MHN does not support redhat/rpm system so tasks need to be rewritten to be completed with appropriate rpm repository or from source.
+Tested with vagrant+ansible or ansible on Ubuntu and CentOS
 
 ## Example Playbook
 
@@ -29,15 +27,14 @@ For example
 - hosts: mhnserver
   roles:
       - maxmind
-      - { role: mhn, mhnmode: server }
+      - mhn
 - hosts: mhnclient
   roles:
-    #- { role: mhn, mhnmode: client, dionaea: true, glastopf: true, wordpot: true }
-    - { role: mhn, mhnmode: client }
+    - { role: mhnclient, dionaea: true, glastopf: true, wordpot: true }
 ```
 
 Once your server is configured, you will need to define additional vars (server_url, deploy_key, ...) before deploying clients.
-deploy_key can be retrieved either from Web UI, either from /var/mhn/server/config.py.
+deploy_key can be retrieved either from Web UI, either from /var/_mhn/mhn/server/config.py.
 
 If you use kippo, after first execution, you must change ssh port in your inventory file (manual inventory or vagrant .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory) or Vagrantfile (config.ssh.port) else you will have no connection. Eventually, you can override it from ansible command line (-e).
 
@@ -62,26 +59,6 @@ Most important are
 * server_url: need to be set to your server IP
 * httpsport: to be define if you want the webserver (nginx) to be configured https only on this port. server_url need to reflect that and if you use a self-signed certificate, curl_arg too.
 * deploy_key: once server is configured, you can extract this value in /var/mhn/server/config.py or through web interface > deploy. It is mandatory for client configuration.
-
-## Continuous integration
-
-This role has a travis basic test (for github), more advanced with kitchen.
-
-Once you ensured all necessary roles are present, You can test with:
-```
-$ cd /path/to/roles/mhn
-$ kitchen verify
-$ kitchen login
-```
-
-Known bugs
-* Ubuntu: the notify 'supervisor restart' fails the first time and nginx too. not sure
-  why. second time run is fine after you do ```sudo service supervisor restart; sudo service nginx restart```
-  (failed notified handlers).
-?
-https://github.com/ansible/ansible/issues/8155
-https://github.com/ansible/ansible/issues/3977
-https://groups.google.com/forum/#!msg/ansible-project/3ot5-ykkAew/ygrdCMnaeHQJ
 
 ## Troubleshooting & Known issues
 
@@ -109,6 +86,21 @@ https://docs.mongodb.com/manual/reference/command/repairDatabase/#using-repairda
 * Centos "You (root) are not allowed to access to (crontab) because of pam configuration."
 check root password is not expired (/var/log/secure).
 It is the case on lxc default images. A task file has been added which set a random password. Better to use ssh key anyway.
+* nginx frontend on debian/ubuntu
+```
+$ cat /var/log/nginx/error.log
+[emerg] 28420#0: unknown directive "uwsgi_param" in /etc/nginx/uwsgi_params:1
+```
+mhn requires uwsgi which is not available in nginx-naxsi or nginx-light
+
+* uwsgi not starting
+```
+$ cat /var/log/mhn/mhn-uwsgi.log
+[...]
+--- no python application found, check your startup logs for errors ---
+```
+chek permissions and user used to run uwsgi: normally _mhn here/
+
 
 ## FAQ
 

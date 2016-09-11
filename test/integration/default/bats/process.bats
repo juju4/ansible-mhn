@@ -44,6 +44,7 @@ setup() {
     run curl -sSqk https://localhost:50443/
     [ "$status" -eq 0 ]
     [[ "$output" =~ "You should be redirected automatically to target URL" ]]
+    [[ "$output" != "Internal Server Error" ]]
 }
 
 @test "Web interface should be accessible through nginx - https://localhost:50443/static/mhn.rules" {

@@ -45,16 +45,28 @@ end
 describe file('/var/log/mhn') do
   it { should be_directory }
 end
-describe file('/etc/supervisor/conf.d/mnemosyne.conf') do
+describe file('/etc/supervisor/conf.d/mnemosyne.conf'), :if => os[:family] == 'ubuntu' do
+  it { should be_file }
+end
+describe file('/etc/supervisord.d/mnemosyne.ini'), :if => os[:family] == 'redhat' do
   it { should be_file }
 end
 describe file('/tmp/uwsgi.sock') do
   it { should be_socket }
 end
 
+describe command("cd /var/_mhn/mhn/server/ && /var/_mhn/mhn/env/bin/python -c 'import mhn'") do
+  its(:exit_status) { should eq 0 }
+end
+
 describe command('supervisorctl status') do
   its(:stdout) { should_not match /FATAL/ }
 #  its(:stderr) { should match /No such file or directory/ }
+  its(:exit_status) { should eq 0 }
+end
+
+describe command('cat /var/log/mongodb/mongod.log') do
+  its(:stdout) { should_not match /ERROR/ }
   its(:exit_status) { should eq 0 }
 end
 

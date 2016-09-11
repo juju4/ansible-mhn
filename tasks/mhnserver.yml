@@ -1,35 +1,8 @@
 ---
 
-- name: apt | Install mhnserver dependencies
-  apt: name={{item}} state=present update_cache=yes cache_valid_time=3600
-  with_items:
-    - build-essential
-    - python-pip
-    - python-dev
-    - git
-    - redis-server
-    - libgeoip-dev
-    - python-virtualenv
-    - nginx
-    - supervisor
-    - ssl-cert
-    - libsqlite3-dev
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
-
-- name: yum | Install mhnserver dependencies
-  yum: name={{item}} state=present update_cache=yes
-  with_items:
-    - "@Development tools"
-    - python-pip
-    - python-devel
-    - git
-    - redis
-    - GeoIP-devel
-    - python-virtualenv
-    - nginx
-    - supervisor
-    - sqlite-devel
-  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+- name: Install mhnserver dependencies
+  package: name={{item}} state=present
+  with_items: "{{ mhnserver_pkg }}"
 
 ## FIXME! xenial: https://github.com/unbit/uwsgi/issues/1262
 - name: fix bug uwsgi and xenial
@@ -40,6 +13,11 @@
   pip: requirements={{ MHN_HOME }}/server/requirements.txt
     virtualenv={{ MHN_HOME }}/env       # path taken from existing scripts, if changed need to change other places
 
+- name: RedHat | Install mhnserver virtualenv pysqlite
+  pip: name=pysqlite version=2.8.1
+    virtualenv={{ MHN_HOME }}/env
+  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
 - stat: path={{ MHN_HOME }}/.configdb_initialized
   register: init_done
 - stat: path={{ MHN_HOME }}/server/config.py
@@ -48,7 +26,7 @@
   command: "{{ item }} chdir={{ MHN_HOME }}/server"
   with_items:
 ## will do nothing if config.py exists
-    - "{{ MHN_HOME }}/env/bin/python generateconfig.py unattended -e {{ MHN_EMAIL }} -p {{ MHN_PASS }} -b {{ server_url }} -y {{ server_url }}:3000 -l {{ MHN_HOME }}/server/mhn.log"
+    - "{{ MHN_HOME }}/env/bin/python generateconfig.py unattended -e {{ MHN_EMAIL }} -p {{ MHN_PASS }} -b {{ server_url }} -y {{ honeymap_url }} -l {{ MHN_HOME }}/server/mhn.log"
 ## out an error if database already initialized
     - "{{ MHN_HOME }}/env/bin/python initdatabase.py"
   when: not config_done.stat.exists or not init_done.stat.exists
@@ -81,18 +59,25 @@
       command: openssl req -x509 -nodes -sha256 -days 1095 -newkey rsa:2048 -subj "{{ certinfo }}/CN={{ certificate_cn }}" -keyout {{ ssl_private }}/{{ ansible_fqdn }}.key -out {{ ssl_cert }}/{{ ansible_fqdn }}.crt
       when: not localsslcert.stat.exists
     - file: path={{ ssl_private }}/{{ ansible_fqdn }}.key owner=root group={{ ssl_group }} mode=0440
-    - name: MHN nginx configuration - https
-      template: src=default-ssl dest={{ nginx_sitedir }}/default-ssl mode=0644
-      notify:
-        - nginx restart
     - name: remove nginx default configuration
       file: path=/etc/nginx/sites-enabled/default state=absent
       notify:
         - nginx restart
-    - file: src={{ nginx_sitedir }}/default-ssl dest=/etc/nginx/sites-enabled/default-ssl state=link
+    - block:
+        - name: MHN nginx configuration - https
+          template: src=default-ssl dest={{ nginx_sitedir }}/default-ssl mode=0644
+          notify:
+            - nginx restart
+        - file: src={{ nginx_sitedir }}/default-ssl dest=/etc/nginx/sites-enabled/default-ssl state=link
+          notify:
+            - nginx restart
       when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
-      notify:
-        - nginx restart
+    - block:
+        - name: MHN nginx configuration - https
+          template: src=default-ssl dest={{ nginx_sitedir }}/mhn-ssl.conf mode=0644
+          notify:
+            - nginx restart
+      when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
   when: httpsport is defined
 
 - name: set mhnserver supervisor config
@@ -144,12 +129,11 @@
   file: "path={{ MHN_HOME }}/server/mhn.log mode=0664 owner={{ mhn_user }} group={{ www_user }}"
   when: mhnlog.stat.exists
 - file: src={{ MHN_HOME }}/server/mhn.log dest=/var/log/mhn/mhn.log state=link force=yes
-- name: ensure good permissions for {{ MHN_HOME }}/server
+- name: ensure good permissions for {{ MHN_HOME }}/server/mhn.db
   file: "path={{ MHN_HOME }}/server/mhn.db mode=0755 owner={{ mhn_user }} group={{ www_user }}"
 
-- name: MHN Server | ensure nginx service is enabled
-  service: name=nginx enabled=yes
+- name: MHN Server | ensure services are enabled and started
+  service: name={{ item }} enabled=yes state=started
+  with_items: "{{ mhnserver_services }}"
 
-## check everything fine ?
-#sudo supervisorctl status
 

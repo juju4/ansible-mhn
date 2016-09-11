@@ -1,0 +1,34 @@
+---
+
+mhnserver_pkg:
+    - "@Development tools"
+    - python-pip
+    - python-devel
+    - git
+    - redis
+    - GeoIP-devel
+    - python-virtualenv
+    - nginx
+    - supervisor
+    - sqlite-devel
+
+mhnserver_services:
+    - nginx
+    - redis
+    - supervisord
+
+www_user: nginx
+nginx_svc: nginx
+nginx_confdir: /etc/nginx/default.d
+nginx_sitedir: /etc/nginx/conf.d
+nginxconf: /etc/nginx/nginx.conf
+nginxdefault: /etc/nginx/nginx.conf
+nginxsslconf:
+
+supervisor_confdir: /etc/supervisord.d
+supervisor_ext: ini
+supervisor_service: supervisord
+ssl_cert: /etc/pki/tls/certs
+ssl_private: /etc/pki/tls/private
+ssl_group: root
+
