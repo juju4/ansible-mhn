@@ -10,14 +10,6 @@ set :backend, :exec
 #end
 
 
-describe service('mongod') do  
-  it { should be_enabled }
-  it { should be_running }
-end
-describe port(27017) do
-  it { should be_listening.with('tcp') }
-end
-
 describe service('redis-server'), :if => os[:family] == 'ubuntu' || os[:family] == 'debian' do  
   it { should be_enabled }
   it { should be_running }
@@ -56,17 +48,6 @@ describe file('/tmp/uwsgi.sock') do
 end
 
 describe command("cd /var/_mhn/mhn/server/ && /var/_mhn/mhn/env/bin/python -c 'import mhn'") do
-  its(:exit_status) { should eq 0 }
-end
-
-describe command('supervisorctl status') do
-  its(:stdout) { should_not match /FATAL/ }
-#  its(:stderr) { should match /No such file or directory/ }
-  its(:exit_status) { should eq 0 }
-end
-
-describe command('cat /var/log/mongodb/mongod.log') do
-  its(:stdout) { should_not match /ERROR/ }
   its(:exit_status) { should eq 0 }
 end
 
