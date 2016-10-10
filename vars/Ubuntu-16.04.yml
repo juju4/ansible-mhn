@@ -12,6 +12,7 @@ mhnserver_pkg:
     - supervisor
     - ssl-cert
     - libsqlite3-dev
+    - cron
 
 mhnserver_services:
     - nginx
