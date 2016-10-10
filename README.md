@@ -30,11 +30,8 @@ For example
       - mhn
 - hosts: mhnclient
   roles:
-    - { role: mhnclient, dionaea: true, glastopf: true, wordpot: true }
+    - { role: mhnclient, mhnclient_dionaea: true, mhnclient_glastopf: true, mhnclient_wordpot: true }
 ```
-
-Once your server is configured, you will need to define additional vars (server_url, deploy_key, ...) before deploying clients.
-deploy_key can be retrieved either from Web UI, either from /var/_mhn/mhn/server/config.py.
 
 If you use kippo, after first execution, you must change ssh port in your inventory file (manual inventory or vagrant .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory) or Vagrantfile (config.ssh.port) else you will have no connection. Eventually, you can override it from ansible command line (-e).
 
@@ -46,19 +43,17 @@ It is recommended to reboot system after the ansible playbook as updates probabl
 ## Example Vagrantfile
 
 Example to use with vagrant on virtualbox joined. need corresponding site.yml (previous section).
-Deployment tested on Virtualbox, Amazon and Digital Ocean.
+Deployment tested mostly on LXD, Virtualbox and Digital Ocean.
 
 ## Variables
 
 Check defaults/main.yml for a full list.
 
 Most important are
-* mhnmode: either server or client
 * MHN_EMAIL: login to web interface
 * MHN_PASS: password to web interface
 * server_url: need to be set to your server IP
 * httpsport: to be define if you want the webserver (nginx) to be configured https only on this port. server_url need to reflect that and if you use a self-signed certificate, curl_arg too.
-* deploy_key: once server is configured, you can extract this value in /var/mhn/server/config.py or through web interface > deploy. It is mandatory for client configuration.
 
 ## Troubleshooting & Known issues
 
@@ -106,6 +101,10 @@ chek permissions and user used to run uwsgi: normally _mhn here/
 
 Check
 https://github.com/threatstream/mhn/wiki/MHN-Troubleshooting-Guide
+
+* Current ELK setup need a local logstash to read local log file on MHN server.
+Elasticsearch can be remote.
+You can use geerlingguy.logstash role to set it up
 
 ## Continuous integration
 

@@ -33,3 +33,4 @@ ssl_cert: /etc/ssl
 ssl_private: /etc/ssl/private
 ssl_group: ssl-cert
 
+mongodb_svc: mongod

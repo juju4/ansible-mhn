@@ -8,6 +8,8 @@ MHN_EMAIL: root@localhost
 MHN_PASS: root@localhost
 ## if defined, web interface will be only https and not default http
 httpsport: 50443
+## if defined restricted web admin interface
+mhn_admin_web_listen: 127.0.0.1
 certinfo: '/C=US/ST=CA/L=San Francisco/O=Ansible'
 ## if http
 #server_url: http://10.254.254.100
@@ -19,9 +21,16 @@ honeymap_url: "https://10.254.254.100:3000"
 curl_arg: '-k'
 mnemosyne_ignore_rfc1918: False
 
-do_splunk: false
-do_arcsight: false
-do_elk: false
+mhn_do_splunk: false
+mhn_do_arcsight: false
+
+mhn_do_elk: false
+## first two are ansible inventory name (for delegate_to), next is hostname/ip
+#mhn_elk_logstashserver: ansible_inventoryname1
+mhn_elk_elasticserver: ansible_inventoryname1
+mhn_elk_elasticserver_host: 127.0.0.1
+mhn_elk_elasticserver_port: 9200
+mhn_elk_elasticserver_templatesdir: /etc/elasticsearch
 
 ## FIXME! missing option
 #whitelist_ip: [ ]

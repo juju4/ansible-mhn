@@ -1,0 +1,46 @@
+
+input {
+  file {
+    path => "/var/log/mhn/mhn-json.log"
+    start_position => "end"
+  }
+}
+filter {
+  json {
+    source => "message"
+  }
+  geoip {
+      source => "src_ip"
+      target => "src_ip_geo"
+      database => "/opt/GeoLiteCity.dat"
+      add_field => [ "[src_ip_geo][coordinates]", "%{[src_ip_geo][longitude]}" ]
+      add_field => [ "[src_ip_geo][coordinates]", "%{[src_ip_geo][latitude]}"  ]
+  }
+  mutate {
+    convert => [ "[src_ip_geo][coordinates]", "float"]
+  }
+  geoip {
+    source => "dst_ip"
+    target => "dst_ip_geo"
+    database => "/opt/GeoLiteCity.dat"
+    add_field => [ "[dst_ip_geo][coordinates]", "%{[dst_ip_geo][longitude]}" ]
+    add_field => [ "[dst_ip_geo][coordinates]", "%{[dst_ip_geo][latitude]}"  ]
+  }
+  mutate {
+      convert => [ "[dst_ip_geo][coordinates]", "float"]
+    }
+}
+output {
+  elasticsearch {
+    host => "{{ mhn_elk_elasticserver_host }}"
+    port => {{ mhn_elk_elasticserver_port }}
+    protocol => "http"
+    index => "mhn-%{+YYYYMMddHH00}"
+    index_type => "event"
+    template_name => "mhn_event"
+    template => "{{ mhn_elk_elasticserver_templatesdir }}/mhn-template.json"
+    template_overwrite => true
+    manage_template => true
+  }
+}
+

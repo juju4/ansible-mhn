@@ -15,7 +15,7 @@
     },
     {
       "type": "shell",
-      "execute_command": "echo 'vagrant' | {{.Vars}} sudo -S -E bash '{{.Path}}'",
+      "execute_command": "echo 'vagrant' | {{.Vars}} sudo -S -E bash '{{.Path}}' /etc/ansible/roles",
       "script": "../get-dependencies.sh"
     },
     {

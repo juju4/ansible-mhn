@@ -2,7 +2,6 @@
 
 - hosts: all
   vars:
-    - mhnmode: server
     - MHN_EMAIL: root@localhost
     - MHN_PASS: root@localhost
   roles:

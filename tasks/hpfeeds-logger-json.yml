@@ -28,25 +28,34 @@
   with_items:
     - hpfeeds-logger==0.0.7.0
 
-- set_fact:
+- name: configure IDENT
+  set_fact:
     IDENT: hpfeeds-logger-json
-- stat: path=/root/.hpfeeds-logger-json
+- name: check if existing configuration
+  stat: path=/root/.mhn_{{ IDENT }}
   register: sstat
-- shell: "python -c 'import uuid;print str(uuid.uuid4()).replace(\"-\",\"\")' | tee /root/.hpfeeds-logger-json"
+- name: create a secret
+  shell: "python -c 'import uuid;print str(uuid.uuid4()).replace(\"-\",\"\")' | tee /root/.mhn_{{ IDENT }}"
   when: not sstat.stat.exists
-- command: "cat /root/.hpfeeds-logger-json"
+  no_log: true
+- name: recover existing hpfeeds secret
+  command: "cat /root/.mhn_{{ IDENT }}"
   register: SECRET
-- set_fact:
+  changed_when: false
+  no_log: true
+- name: configure CHANNELS
+  set_fact:
     CHANNELS: 'amun.events,dionaea.connections,dionaea.capture,glastopf.events,beeswarm.hive,kippo.sessions,conpot.events,snort.alerts,suricata.events,wordpot.events,shockpot.events,p0f.events,elastichoney.events'
 
 
-- template: src=json.json dest=/opt/hpfeeds-logger/json.json mode=0600
+- name: enable hpfeeds json
+  template: src=json.json.j2 dest=/opt/hpfeeds-logger/json.json mode=0600
 
-- command: '/opt/hpfeeds/env/bin/python /opt/hpfeeds/broker/add_user.py "{{ IDENT }}" "{{ SECRET.stdout }}" "" "{{ CHANNELS }}"'
+- name: add hpfeeds broker user for json
+  command: '/opt/hpfeeds/env/bin/python /opt/hpfeeds/broker/add_user.py "{{ IDENT }}" "{{ SECRET.stdout }}" "" "{{ CHANNELS }}"'
 
-- file: path=/var/log/mhn state=directory mode=0755
-
-- template: src=hpfeeds-logger-json.conf dest=/etc/supervisor/conf.d/hpfeeds-logger-json.conf mode=0644
+- name: configure hpfeeds-logger-json in supervisor
+  template: src=hpfeeds-logger-json.conf.j2 dest=/etc/supervisor/conf.d/hpfeeds-logger-json.conf mode=0644
   notify:
     - supervisor update
 

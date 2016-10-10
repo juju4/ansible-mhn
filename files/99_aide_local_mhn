@@ -11,7 +11,7 @@
 /var/mhn/server/mhn\.log\.6\.gz$ HiSerMemberLog
 /var/lib/redis$ VarDirTime
 /var/lib/redis/dump.rdb$ OwnerMode
-var/mhn/server/celerybeat-schedule$ InodeData
+/var/mhn/server/celerybeat-schedule$ InodeData
 /var/mhn/server/celerybeat.pid$ InodeData
 /var/mhn/server/mhn/static/mhn.rules$ InodeData
 ## node

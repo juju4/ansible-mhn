@@ -1,12 +1,16 @@
 ## /etc/nginx/sites-available/default
 server {
-    listen       80;
+{% if mhn_admin_web_listen is defined and mhn_admin_web_listen != '' %}
+    listen {{ mhn_admin_web_listen }}:80;
+{% else %}
+	listen 80;
+{% endif %}
     server_name  _;
-    
+
     location / { 
         try_files \$uri @mhnserver; 
     }
-    
+
     root /opt/www;
     location @mhnserver {
       include uwsgi_params;

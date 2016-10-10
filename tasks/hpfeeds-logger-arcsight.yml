@@ -27,27 +27,35 @@
   with_items:
     - hpfeeds-logger==0.0.7.0
 
-- set_fact:
+- name: configure IDENT
+  set_fact:
     IDENT: hpfeeds-logger-arcsight
-- stat: path=/root/.hpfeeds-logger-arcsight
+- name: check if existing configuration
+  stat: path="/root/.mhn_{{ IDENT }}"
   register: sstat
-- shell: "python -c 'import uuid;print str(uuid.uuid4()).replace(\"-\",\"\")' | tee /root/.hpfeeds-logger-arcsight"
+- name: create a secret
+  shell: "python -c 'import uuid;print str(uuid.uuid4()).replace(\"-\",\"\")' | tee /root/.mhn_{{ IDENT }}"
   when: not sstat.stat.exists
-- command: "cat /root/.hpfeeds-logger-arcsight"
+  no_log: true
+- name: recover existing hpfeeds secret
+  command: "cat /root/.mhn_{{ IDENT }}"
 ## OR
 #- command: python /opt/hpfeeds/broker/get_secret.py {{ IDENT }}
   register: SECRET
-- set_fact:
+  changed_when: false
+  no_log: true
+- name: configure CHANNELS
+  set_fact:
     CHANNELS: 'amun.events,dionaea.connections,dionaea.capture,glastopf.events,beeswarm.hive,kippo.sessions,conpot.events,snort.alerts,suricata.events,wordpot.events,shockpot.events,p0f.events,elastichoney.events'
 
+- name: enable hpfeeds json for arcsight
+  template: src=arcsight.arcsight dest=/opt/hpfeeds-logger/arcsight.json mode=0600
 
-- template: src=arcsight.arcsight dest=/opt/hpfeeds-logger/arcsight.json mode=0600
+- name: add hpfeeds broker user for json arcsight
+  command: '/opt/hpfeeds/env/bin/python /opt/hpfeeds/broker/add_user.py "{{ IDENT }}" "{{ SECRET.stdout }}" "" "{{ CHANNELS }}"'
 
-- command: '/opt/hpfeeds/env/bin/python /opt/hpfeeds/broker/add_user.py "{{ IDENT }}" "{{ SECRET.stdout }}" "" "{{ CHANNELS }}"'
-
-- file: path=/var/log/mhn state=directory mode=0755
-
-- template: src=hpfeeds-logger-arcsight.conf dest=/etc/supervisor/conf.d/hpfeeds-logger-arcsight.conf mode=0644
+- name: configure hpfeeds-logger-arcsight in supervisor
+  template: src=hpfeeds-logger-arcsight.conf dest=/etc/supervisor/conf.d/hpfeeds-logger-arcsight.conf mode=0644
   notify:
     - supervisor update
 

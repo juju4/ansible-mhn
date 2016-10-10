@@ -12,11 +12,6 @@
 
 - name: Install MHN Server
   include: server.yml
-#  when: mhnmode == 'server'
-
-#- name: Install MHN Client
-#  include: client.yml
-#  when: mhnmode == 'client'
 
 - name: Debian | Check if a reboot is required
   register: file

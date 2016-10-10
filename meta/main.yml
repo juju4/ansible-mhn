@@ -5,6 +5,9 @@ galaxy_info:
   license: BSD
   min_ansible_version: 1.9
   platforms:
+  - name: EL
+    versions:
+    - 7
   - name: Ubuntu
     versions:
   #  - precise
@@ -12,6 +15,7 @@ galaxy_info:
   #  - raring
   #  - saucy
     - trusty
+    - xenial
   - name: Debian
     versions:
   #  - all
@@ -20,7 +24,7 @@ galaxy_info:
   #  - squeeze
   #  - wheezy
   #  - jessie
-  categories:
+  galaxy_tags:
     - networking
     - system
     - security

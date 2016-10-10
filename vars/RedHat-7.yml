@@ -32,3 +32,5 @@ ssl_cert: /etc/pki/tls/certs
 ssl_private: /etc/pki/tls/private
 ssl_group: root
 
+mongodb_svc: mongod
+

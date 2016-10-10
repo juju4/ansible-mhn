@@ -26,6 +26,9 @@
   become: yes
   become_user: "{{ mhn_user }}"
 
+- name: ensure mhn log dir exists
+  file: path=/var/log/mhn state=directory mode=0755
+
 - name: Install MHN Server - hpfeeds
   include: hpfeeds.yml
 - name: Install MHN Server - mnemosyne
@@ -35,12 +38,15 @@
 - name: Install MHN Server - mhnserver
   include: mhnserver.yml
 
+- include: hpfeeds-logger-json.yml
+  when: mhn_do_elk is defined and mhn_do_elk
+
 - include: splunk.yml
-  when: do_splunk is defined and do_splunk
+  when: mhn_do_splunk is defined and mhn_do_splunk
 - include: arcsight.yml
-  when: do_arcsight is defined and do_arcsight
+  when: mhn_do_arcsight is defined and mhn_do_arcsight
 - include: elk.yml
-  when: do_elk is defined and do_elk
+  when: mhn_do_elk is defined and mhn_do_elk
 
 - block:
     - file: dest=/etc/aide/aide.conf.d state=directory mode=0755

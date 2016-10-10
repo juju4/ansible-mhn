@@ -4,8 +4,6 @@
       apt_key: keyserver=hkp://keyserver.ubuntu.com:80 id=7F0CEB10
     - name: Ubuntu | Add Mongodb repository
       apt_repository: repo='deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' state=present
-    - set_fact:
-        mongodb_svc: mongod
   when: (ansible_distribution == 'Ubuntu' and ansible_lsb.major_release|int < 16)
 ## https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/
 - block:
@@ -17,13 +15,13 @@
     - name: Ubuntu | Add Mongodb repository
       apt_repository: repo='deb http://repo.mongodb.org/apt/{{ ansible_distribution|lower }} {{ ansible_distribution_release }}/mongodb-org/3.2 multiverse' state=present
       when: ansible_distribution == 'Ubuntu'
-    - set_fact:
-        mongodb_svc: mongod
     - name: configure systemd config file (not included)
-      template: src=mongodb.service.j2 dest=/lib/systemd/system/mongod.service mode=0644
+## FIXME! FAILED! => {"changed": true, "failed": true, "msg": "Destination /lib/systemd/system not writable"}
+#      template: src=mongodb.service.j2 dest=/lib/systemd/system/mongod.service mode=0644
+      template: src=mongodb.service.j2 dest=/usr/lib/systemd/system/mongod.service mode=0644
 ## http://askubuntu.com/questions/757384/can-i-use-14-04-mongodb-packages-with-16-04
     - name: enable service mongodb
-      service: name={{ mongodb_svc }} enabled=yes
+      service: name={{ mongodb_svc }} enabled=yes state=started
 #    - name: unmask mongodb from systemctl
 #      command: "systemctl unmask mongodb"
   when: ansible_distribution == 'Debian' or (ansible_distribution == 'Ubuntu' and ansible_lsb.major_release|int >= 16)
@@ -32,8 +30,6 @@
 - block:
     - name: install mongodb yum repository
       template: src=mongodb.repo.j2 dest=/etc/yum.repos.d/mongodb.repo mode=0644
-    - set_fact:
-        mongodb_svc: mongod
   when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
 
 - name: apt | Install mongodb
@@ -56,12 +52,15 @@
 #    - 'logrotatesize=20M'
 #    - 'logrotatebackups=7'
 
-- stat: path=/var/lib/mongodb
+- name: evaluating /var/lib/mongodb
+  stat: path=/var/lib/mongodb
   register: mongodblib
 - block:
     - name: ensure appropriate permissions for /var/lib/mongodb
       file: dest={{ item }} owner=mongodb
       with_fileglob:
         - /var/lib/mongodb/*
+## {"failed": true, "item": "/var/lib/mongodb/local.ns", "msg": "file (/var/lib/mongodb/local.ns) is absent, cannot continue", "path": "/var/lib/mongodb/local.ns", "state": "absent"}
+      ignore_errors: true
   when: mongodblib.stat.exists
 
