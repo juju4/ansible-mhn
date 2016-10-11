@@ -45,7 +45,6 @@
 - block:
     - name: MHN nginx configuration - http
       template: src=default dest={{ nginx_sitedir }}/default mode=0644
-      when: httpsport is undefined
       notify:
         - nginx restart
     - name: MHN | Debian - enable http configuration
@@ -53,7 +52,7 @@
       when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
       notify:
         - nginx restart
-  when: httpsport is undefined
+  when: mhn_httpport is defined
 
 - block:
     - name: check if certificate exists
@@ -85,7 +84,7 @@
           notify:
             - nginx restart
       when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
-  when: httpsport is defined
+  when: mhn_httpsport is defined
 
 - name: set mhnserver supervisor config
   template: "src={{ item }}.conf dest={{ supervisor_confdir }}/{{ item }}.{{ supervisor_ext }} mode=0644"

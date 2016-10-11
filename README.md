@@ -96,6 +96,9 @@ $ cat /var/log/mhn/mhn-uwsgi.log
 ```
 chek permissions and user used to run uwsgi: normally _mhn here/
 
+* cron issue inside travis+docker
+https://github.com/ansible/ansible-modules-core/pull/4777
+= pending release
 
 ## FAQ
 

@@ -16,8 +16,6 @@ galaxy_info:
   #  - saucy
     - trusty
     - xenial
-  - name: Debian
-    versions:
   #  - all
   #  - etch
   #  - lenny
@@ -29,6 +27,6 @@ galaxy_info:
     - system
     - security
 dependencies:
-    - maxmind
-    - redhat-epel
+    - juju4.maxmind
+    - juju4.redhat-epel
 

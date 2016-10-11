@@ -6,15 +6,16 @@ mhn_userdir: /var/_mhn
 MHN_HOME: "{{ mhn_userdir }}/mhn"
 MHN_EMAIL: root@localhost
 MHN_PASS: root@localhost
-## if defined, web interface will be only https and not default http
-httpsport: 50443
+## if https port not defined, web interface will not be enable
+mhn_httpport: 5080
+mhn_httpsport: 50443
 ## if defined restricted web admin interface
 mhn_admin_web_listen: 127.0.0.1
 certinfo: '/C=US/ST=CA/L=San Francisco/O=Ansible'
 ## if http
 #server_url: http://10.254.254.100
 ## if https
-server_url: "https://10.254.254.100:{{ httpsport }}"
+server_url: "https://10.254.254.100:{{ mhn_httpsport }}"
 honeymap_url: "https://10.254.254.100:3000"
 ## if self-signed certificate
 #curl_arg: ''

@@ -5,9 +5,9 @@
 
 server {
 {% if mhn_admin_web_listen is defined and mhn_admin_web_listen != '' %}
-    listen {{ mhn_admin_web_listen }}:{{ httpsport }};
+    listen {{ mhn_admin_web_listen }}:{{ mhn_httpsport }};
 {% else %}
-    listen {{ httpsport }};
+    listen {{ mhn_httpsport }};
 {% endif %}
     server_name  _;
     server_tokens off;
