@@ -9,6 +9,6 @@ else
 rolesdir=$(dirname $0)/..
 fi
 
-[ ! -d $rolesdir/maxmind ] && git clone https://github.com/juju4/ansible-maxmind $rolesdir/maxmind
-[ ! -d $rolesdir/redhat-epel ] && git clone https://github.com/juju4/ansible-redhat-epel $rolesdir/redhat-epel
+[ ! -d $rolesdir/juju4.maxmind ] && git clone https://github.com/juju4/ansible-maxmind $rolesdir/juju4.maxmind
+[ ! -d $rolesdir/juju4.redhat-epel ] && git clone https://github.com/juju4/ansible-redhat-epel $rolesdir/juju4.redhat-epel
 
