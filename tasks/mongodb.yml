@@ -15,6 +15,8 @@
     - name: Ubuntu | Add Mongodb repository
       apt_repository: repo='deb http://repo.mongodb.org/apt/{{ ansible_distribution|lower }} {{ ansible_distribution_release }}/mongodb-org/3.2 multiverse' state=present
       when: ansible_distribution == 'Ubuntu'
+    - name: ensure systemd config directory exists
+      file: dest=/usr/lib/systemd/system state=directory mode=0755
     - name: configure systemd config file (not included)
 ## FIXME! FAILED! => {"changed": true, "failed": true, "msg": "Destination /lib/systemd/system not writable"}
 #      template: src=mongodb.service.j2 dest=/lib/systemd/system/mongod.service mode=0644
@@ -28,6 +30,7 @@
 
 ## https://docs.mongodb.com/manual/tutorial/install-mongodb-on-red-hat/
 - block:
+## FIXME! fails sometimes 'Package mongodb-org-3.2.10-1.el7.x86_64.rpm is not signed'... https://jira.mongodb.org/browse/SERVER-26583
     - name: install mongodb rpm key
       rpm_key: key=https://www.mongodb.org/static/pgp/server-3.2.asc state=present
     - name: install mongodb yum repository
