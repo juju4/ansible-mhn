@@ -39,7 +39,7 @@ before_install:
   - env
   - pwd
   - find -ls
-  - ln -s ansible-mhn ../mhn && cd ../mhn
+  - ln -s ansible-mhn ../juju4.mhn
   - ./get-dependencies.sh
   - cp test/travis/initctl_faker test/
   # Customize container

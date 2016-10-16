@@ -32,8 +32,7 @@ filter {
 }
 output {
   elasticsearch {
-    host => "{{ mhn_elk_elasticserver_host }}"
-    port => {{ mhn_elk_elasticserver_port }}
+    hosts => "{{ mhn_elk_elasticserver_host }}:{{ mhn_elk_elasticserver_port }}"
     protocol => "http"
     index => "mhn-%{+YYYYMMddHH00}"
     index_type => "event"

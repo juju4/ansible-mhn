@@ -44,11 +44,11 @@
 
 - block:
     - name: MHN nginx configuration - http
-      template: src=default dest={{ nginx_sitedir }}/default mode=0644
+      template: src=default dest={{ nginx_sitedir }}/default-mhn mode=0644
       notify:
         - nginx restart
     - name: MHN | Debian - enable http configuration
-      file: src={{ nginx_sitedir }}/default dest=/etc/nginx/sites-enabled/default state=link
+      file: src={{ nginx_sitedir }}/default-mhn dest=/etc/nginx/sites-enabled/default-mhn state=link
       when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
       notify:
         - nginx restart
@@ -65,16 +65,17 @@
     - name: ensure key file permissions are correct
       file: path={{ ssl_private }}/{{ ansible_fqdn }}.key owner=root group={{ ssl_group }} mode=0440
     - name: remove nginx default configuration
-      file: path=/etc/nginx/sites-enabled/default state=absent
+      file: path=/etc/nginx/sites-enabled/default-mhn state=absent
+      when: mhn_httpport is not defined
       notify:
         - nginx restart
     - block:
         - name: MHN nginx configuration - https
-          template: src=default-ssl dest={{ nginx_sitedir }}/default-ssl mode=0644
+          template: src=default-ssl dest={{ nginx_sitedir }}/default-ssl-mhn mode=0644
           notify:
             - nginx restart
         - name: enable default-ssl nginx configuration
-          file: src={{ nginx_sitedir }}/default-ssl dest=/etc/nginx/sites-enabled/default-ssl state=link
+          file: src={{ nginx_sitedir }}/default-ssl-mhn dest=/etc/nginx/sites-enabled/default-ssl-mhn state=link
           notify:
             - nginx restart
       when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'

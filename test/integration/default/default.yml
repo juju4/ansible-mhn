@@ -5,6 +5,6 @@
     - MHN_EMAIL: root@localhost
     - MHN_PASS: root@localhost
   roles:
-    - maxmind
-    - mhn
+    - juju4.maxmind
+    - juju4.mhn
 

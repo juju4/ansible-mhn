@@ -51,8 +51,15 @@
 - name: enable hpfeeds json
   template: src=json.json.j2 dest=/opt/hpfeeds-logger/json.json mode=0600
 
+- name: check if adduser marker
+  stat: path="/root/.mhn_{{ IDENT }}_add_user"
+  register: adduser
 - name: add hpfeeds broker user for json
   command: '/opt/hpfeeds/env/bin/python /opt/hpfeeds/broker/add_user.py "{{ IDENT }}" "{{ SECRET.stdout }}" "" "{{ CHANNELS }}"'
+  when: not adduser.stat.exists
+- name: add adduser marker
+  file: dest="/root/.mhn_{{ IDENT }}_add_user" state=touch
+  when: not adduser.stat.exists
 
 - name: configure hpfeeds-logger-json in supervisor
   template: src=hpfeeds-logger-json.conf.j2 dest=/etc/supervisor/conf.d/hpfeeds-logger-json.conf mode=0644
