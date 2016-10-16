@@ -28,6 +28,8 @@
 
 ## https://docs.mongodb.com/manual/tutorial/install-mongodb-on-red-hat/
 - block:
+    - name: install mongodb rpm key
+      rpm_key: key=https://www.mongodb.org/static/pgp/server-3.2.asc state=present
     - name: install mongodb yum repository
       template: src=mongodb.repo.j2 dest=/etc/yum.repos.d/mongodb.repo mode=0644
   when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'

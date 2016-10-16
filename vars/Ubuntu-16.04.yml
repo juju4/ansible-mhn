@@ -13,6 +13,7 @@ mhnserver_pkg:
     - ssl-cert
     - libsqlite3-dev
     - cron
+    - systemd
 
 mhnserver_services:
     - nginx
