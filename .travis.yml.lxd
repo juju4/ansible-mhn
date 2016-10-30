@@ -7,8 +7,8 @@ rvm:
 env:
 #  - distribution: centos
 #    version: 6
-  - distribution: centos
-    version: 7
+#  - distribution: centos
+#    version: 7
   - distribution: ubuntu
     version: 16.04
   - distribution: ubuntu
