@@ -26,7 +26,7 @@
   pip: name="{{ item }}"
     virtualenv=/opt/hpfeeds-logger
   with_items:
-    - hpfeeds-logger==0.0.7.0
+    - hpfeeds-logger==0.0.7.2
 
 - name: configure IDENT
   set_fact:
@@ -45,7 +45,7 @@
   no_log: true
 - name: configure CHANNELS
   set_fact:
-    CHANNELS: 'amun.events,dionaea.connections,dionaea.capture,glastopf.events,beeswarm.hive,kippo.sessions,conpot.events,snort.alerts,suricata.events,wordpot.events,shockpot.events,p0f.events,elastichoney.events'
+    CHANNELS: 'amun.events,dionaea.connections,dionaea.capture,glastopf.events,beeswarm.hive,kippo.sessions,cowrie.sessions,,conpot.events,snort.alerts,suricata.events,wordpot.events,shockpot.events,p0f.events,elastichoney.events'
 
 
 - name: enable hpfeeds json

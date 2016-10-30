@@ -9,6 +9,7 @@
         "glastopf.events",
         "beeswarm.hive",
         "kippo.sessions",
+        "cowrie.sessions",
         "conpot.events",
         "snort.alerts",
         "amun.events",

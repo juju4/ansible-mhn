@@ -44,8 +44,12 @@
 
 - stat: path={{ MHN_HOME }}/.addusermnemosyne
   register: addusermnemosyne
+- name: generate random secret
+  shell: "openssl rand -base64 48 | sed 's@[=\\/\\+]@@g;'"
+  changed_when: false
+  register: rand
 - set_fact:
-    SECRET: "{{ 100 | random }}"
+    SECRET: "{{ rand.stdout }}"
   when: not addusermnemosyne.stat.exists
 - name: ensure mongdb is active
   service: name={{ mongodb_svc }} state=started

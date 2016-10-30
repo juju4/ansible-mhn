@@ -11,12 +11,13 @@ mhn_httpport: 5080
 mhn_httpsport: 50443
 ## if defined restricted web admin interface
 mhn_admin_web_listen: 127.0.0.1
+#mhn_admin_web_listen: 10.254.254.100
 certinfo: '/C=US/ST=CA/L=San Francisco/O=Ansible'
 ## if http
-#server_url: http://10.254.254.100
+#server_url: "http://{{ mhn_admin_web_listen }}"
 ## if https
-server_url: "https://10.254.254.100:{{ mhn_httpsport }}"
-honeymap_url: "https://10.254.254.100:3000"
+server_url: "https://{{ mhn_admin_web_listen }}:{{ mhn_httpsport }}"
+honeymap_url: "https://{{ mhn_admin_web_listen }}:3000"
 ## if self-signed certificate
 #curl_arg: ''
 curl_arg: '-k'
@@ -36,14 +37,18 @@ mhn_elk_elasticserver_templatesdir: /etc/elasticsearch
 ## FIXME! missing option
 #whitelist_ip: [ ]
 
+## Note: CHANNELS is used with different value at different places...
 ## https://github.com/threatstream/mhn/blob/master/scripts/install_mnemosyne.sh
 IDENT: mnemosyne
-CHANNELS: 'amun.events,conpot.events,thug.events,beeswarm.hive,dionaea.capture,dionaea.connections,thug.files,beeswarn.feeder,cuckoo.analysis,kippo.sessions,glastopf.events,glastopf.files,mwbinary.dionaea.sensorunique,snort.alerts,wordpot.events,p0f.events,suricata.events,shockpot.events,elastichoney.events'
+CHANNELS: 'amun.events,conpot.events,thug.events,beeswarm.hive,dionaea.capture,dionaea.connections,thug.files,beeswarn.feeder,cuckoo.analysis,kippo.sessions,cowrie.sessions,glastopf.events,glastopf.files,mwbinary.dionaea.sensorunique,snort.alerts,wordpot.events,p0f.events,suricata.events,shockpot.events,elastichoney.events'
 
-golang_v: 1.6.3
+## = use role golang
+#golang_v: 1.6.3
+#golang_v: 1.7.3
 
 
 backupdir: /var/_backup
 scriptsdir: /usr/local/scripts
 noreboot: true
+mhn_monitoring_nrpe: true
 

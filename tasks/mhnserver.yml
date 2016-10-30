@@ -9,6 +9,10 @@
   replace: dest={{ MHN_HOME }}/server/requirements.txt regexp='^uWSGI.*' replace='uWSGI'
   when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'xenial'
 
+#- name: Install mhnserver virtualenv pycparser BUG https://github.com/pyca/cryptography/issues/3187
+#  pip: name=pycparser version=2.14
+#    virtualenv={{ MHN_HOME }}/env
+
 - name: Install mhnserver virtualenv
   pip: requirements={{ MHN_HOME }}/server/requirements.txt
     virtualenv={{ MHN_HOME }}/env       # path taken from existing scripts, if changed need to change other places
@@ -41,6 +45,9 @@
   file: path=/opt/www state=directory mode=755
 - name: MHN server | ensure pid directory for mhn user
   file: path=/var/run/mhn state=directory mode=755 owner={{ mhn_user }}
+- name: MHN server | ensure pid directory for mhn user at reboot (systemd-tmpfiles)
+  lineinfile: dest=/etc/tmpfiles.d/mhn.conf line='    d    /run/mhn   0755 _mhn _mhn - -' create=yes
+  when: ansible_service_mgr == 'systemd'
 
 - block:
     - name: MHN nginx configuration - http
@@ -101,8 +108,12 @@
 - set_fact:
     MHN_UUID: "{{ 100 | random }}"
   when: not addusercollector.stat.exists
+- name: generate random secret
+  shell: "openssl rand -base64 48 | sed 's@[=\\/\\+]@@g;'"
+  changed_when: false
+  register: rand
 - set_fact:
-    SECRET: "{{ 100 | random }}"
+    SECRET: "{{ rand.stdout }}"
   when: not addusercollector.stat.exists
 - command: '/opt/hpfeeds/env/bin/python /opt/hpfeeds/broker/add_user.py "collector" "{{ SECRET }}" "" "geoloc.events"'
   when: not addusercollector.stat.exists

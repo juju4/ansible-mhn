@@ -100,6 +100,17 @@ chek permissions and user used to run uwsgi: normally _mhn here/
 https://github.com/ansible/ansible-modules-core/pull/4777
 = pending release
 
+* geoloc module FATAL error
+check following commands:
+```
+$ cat /opt/hpfeeds/geoloc.json
+$ mongo hpfeeds -eval "db.auth_key.find({identifier: 'geoloc'}).forEach(function(r){print(JSON.stringify(r));})" 
+```
+https://groups.google.com/forum/#!topic/modern-honey-network/FKQRr_ZHVfA
+It happens also on mhnclient+mhn test config on Ubuntu trusty only for unknown reason.
+
+
+
 ## FAQ
 
 Check
@@ -108,6 +119,9 @@ https://github.com/threatstream/mhn/wiki/MHN-Troubleshooting-Guide
 * Current ELK setup need a local logstash to read local log file on MHN server.
 Elasticsearch can be remote.
 You can use geerlingguy.logstash role to set it up
+
+* Alternatives
+http://dtag-dev-sec.github.io/mediator/feature/2016/03/11/t-pot-16.03.html
 
 ## Continuous integration
 
@@ -138,7 +152,7 @@ $ cp -Rd /path/to/mhn/packer .
 ## you can add additional role dependencies inside setup-roles.sh
 $ cd packer
 $ packer build packer-*.json
-$ packer build -only=virtualbox packer-*.json
+$ packer build -only=virtualbox-iso packer-*.json
 ## if you want to enable extra log
 $ PACKER_LOG=1 packer build packer-*.json
 ## for digitalocean build, you need to export TOKEN in environment.

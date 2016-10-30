@@ -27,6 +27,7 @@ galaxy_info:
     - system
     - security
 dependencies:
-    - juju4.maxmind
     - juju4.redhat-epel
+    - juju4.maxmind
+    - juju4.golang
 

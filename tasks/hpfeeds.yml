@@ -43,6 +43,9 @@
     virtualenv=/opt/hpfeeds/env
   with_items:
     - cffi
+## FIXME! AssertionError: sorry, but this version only supports 100 named groups + Current: 16.2.0 ~ 0.16.2/same error
+## https://github.com/pyca/cryptography/issues/3187
+#    - pycparser==2.14
     - pyopenssl==0.14
     - pymongo
 ## FIXME! never detected as installed = changed at each run

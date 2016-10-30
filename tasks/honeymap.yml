@@ -23,29 +23,29 @@
     - supervisor
   when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
 
-## recent golang? 1.4.2
+## recent golang = switched to golang role
 ## alternative? https://launchpad.net/~evarlast/+archive/ubuntu/golang1.4
-- set_fact:
-    architecture: 386
-  when: ansible_architecture == 'i386'
-- set_fact:
-    architecture: amd64
-  when: ansible_architecture == 'x86_64'
-- stat: path=/usr/local/go{{ golang_v }}.linux-{{ architecture }}.tar.gz
-  register: goarchive
-- name: download recent golang
-  get_url: url=https://storage.googleapis.com/golang/go{{ golang_v }}.linux-{{ architecture }}.tar.gz dest=/usr/local/go{{ golang_v }}.linux-{{ architecture }}.tar.gz mode=0440
-  when: not goarchive.stat.exists
-- stat: path=/usr/local/go
-  register: godir
-- command: tar xzf /usr/local/go{{ golang_v }}.linux-{{ architecture }}.tar.gz -C /usr/local/
-  when: not godir.stat.exists
-
-- file: src=/usr/local/go/bin/{{ item }} dest=/usr/bin/{{ item }} state=link
-  with_items:
-    - go
-    - godoc
-    - gofmt
+#- set_fact:
+#    architecture: 386
+#  when: ansible_architecture == 'i386'
+#- set_fact:
+#    architecture: amd64
+#  when: ansible_architecture == 'x86_64'
+#- stat: path=/usr/local/go{{ golang_v }}.linux-{{ architecture }}.tar.gz
+#  register: goarchive
+#- name: download recent golang
+#  get_url: url=https://storage.googleapis.com/golang/go{{ golang_v }}.linux-{{ architecture }}.tar.gz dest=/usr/local/go{{ golang_v }}.linux-{{ architecture }}.tar.gz mode=0440
+#  when: not goarchive.stat.exists
+#- stat: path=/usr/local/go
+#  register: godir
+#- command: tar xzf /usr/local/go{{ golang_v }}.linux-{{ architecture }}.tar.gz -C /usr/local/
+#  when: not godir.stat.exists
+#
+#- file: src=/usr/local/go/bin/{{ item }} dest=/usr/bin/{{ item }} state=link
+#  with_items:
+#    - go
+#    - godoc
+#    - gofmt
 
 - stat: path=/opt/honeymap
   register: githoneymap
@@ -57,10 +57,15 @@
 
 - stat: path={{ MHN_HOME }}/.adduserhoneymap
   register: adduserhoneymap
+- name: generate random secret
+  shell: "openssl rand -base64 48 | sed 's@[=\\/\\+]@@g;'"
+  changed_when: false
+  register: rand
 - set_fact:
-    SECRET: "{{ 100 | random }}"
+    SECRET: "{{ rand.stdout }}"
   when: not adduserhoneymap.stat.exists
-- command: '/opt/hpfeeds/env/bin/python /opt/hpfeeds/broker/add_user.py "honeymap" "{{ SECRET }}" "" "geoloc.events"'
+- name: add user to hpfeeds
+  command: '/opt/hpfeeds/env/bin/python /opt/hpfeeds/broker/add_user.py "honeymap" "{{ SECRET }}" "" "geoloc.events"'
   when: not adduserhoneymap.stat.exists
 - name: Set up config.json
   template: src=config.json
@@ -110,10 +115,16 @@
 
 - stat: path={{ MHN_HOME }}/.addusergeoloc
   register: addusergeoloc
+- name: generate random secret
+  shell: "openssl rand -base64 48 | sed 's@[=\\/\\+]@@g;'"
+  changed_when: false
+  register: rand
 - set_fact:
-    SECRET: "{{ 100 | random }}"
+    SECRET: "{{ rand.stdout }}"
   when: not addusergeoloc.stat.exists
-- command: '/opt/hpfeeds/env/bin/python /opt/hpfeeds/broker/add_user.py "geoloc" "{{ SECRET }}" "geoloc.events" "amun.events,dionaea.connections,dionaea.capture,glastopf.events,beeswarm.hive,kippo.sessions,conpot.events,snort.alerts,kippo.alerts,wordpot.events,shockpot.events,p0f.events,suricata.events,elastichoney.events"'
+- name: add hpfeeds user for honeymap
+  command: '/opt/hpfeeds/env/bin/python /opt/hpfeeds/broker/add_user.py "geoloc" "{{ SECRET }}" "geoloc.events" "amun.events,dionaea.connections,dionaea.capture,glastopf.events,beeswarm.hive,kippo.sessions,cowrie.sessions,conpot.events,snort.alerts,kippo.alerts,cowrie.alerts,wordpot.events,shockpot.events,p0f.events,suricata.events,elastichoney.events
+"'
   when: not addusergeoloc.stat.exists
 - name: Set up geoloc.json
   template: src=geoloc.json
