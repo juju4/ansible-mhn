@@ -34,7 +34,7 @@ fi
 #[ X`which systemctl` != 'X' ] && systemctl status supervisor --no-pager
 #[ X`which journalctl` != 'X' ] && journalctl -xe --no-pager
 apt-get -f -y install
-tail -50 /var/log/apt/syslog
+tail -50 /var/log/syslog
 tail -50 /var/log/apt/history.log
 tail -50 /var/log/mongodb/mongod.log
 true
