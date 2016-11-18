@@ -74,6 +74,7 @@ server {
     location @mhnserver {
       include uwsgi_params;
       uwsgi_pass unix:/tmp/uwsgi.sock;
+#      uwsgi_pass 127.0.0.1:9999;
     }
     location  /static {
       alias {{ MHN_HOME }}/server/mhn/static;

@@ -13,10 +13,12 @@ As stated in MHN FAQ, you need proper updates and hardening for those systems. (
 It was tested on the following versions:
  * 2.0
  * 2.1
+ * 2.2
 
 ### Operating systems
 
-Tested with vagrant+ansible or ansible on Ubuntu and CentOS
+Tested with Ubuntu 14.04, 16.04 and CentOS 7
+Ubuntu 12.04 is supported in official MHN scripts but with libev compiled from source (pyev require 4.15+, precise only has 4.11). In the same way, Centos6 requires source install of libev and python 2.7. Both are not included in this role currently.
 
 ## Example Playbook
 
@@ -104,10 +106,14 @@ https://github.com/ansible/ansible-modules-core/pull/4777
 check following commands:
 ```
 $ cat /opt/hpfeeds/geoloc.json
-$ mongo hpfeeds -eval "db.auth_key.find({identifier: 'geoloc'}).forEach(function(r){print(JSON.stringify(r));})" 
+$ mongo hpfeeds -eval "db.auth_key.find({identifier: 'geoloc'}).pretty();"
 ```
 https://groups.google.com/forum/#!topic/modern-honey-network/FKQRr_ZHVfA
 It happens also on mhnclient+mhn test config on Ubuntu trusty only for unknown reason.
+
+* Centos7: 502 Bad gateway between nginx and uwsgi.
+when switching uwsgi to http socket, web interface is accessible directly through uwsgi but still 502 on nginx.
+pending.
 
 
 
@@ -154,7 +160,7 @@ $ cd packer
 $ packer build packer-*.json
 $ packer build -only=virtualbox-iso packer-*.json
 ## if you want to enable extra log
-$ PACKER_LOG=1 packer build packer-*.json
+$ PACKER_LOG_PATH="packerlog.txt" PACKER_LOG=1 packer build packer-*.json
 ## for digitalocean build, you need to export TOKEN in environment.
 ##  update json config on your setup and region.
 $ export DO_TOKEN=xxx

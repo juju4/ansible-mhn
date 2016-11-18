@@ -58,13 +58,13 @@
 #    - 'logrotatebackups=7'
 
 - name: evaluating /var/lib/mongodb
-  stat: path=/var/lib/mongodb
+  stat: path="{{ mongodb_varlib }}"
   register: mongodblib
 - block:
     - name: ensure appropriate permissions for /var/lib/mongodb
       file: dest={{ item }} owner=mongodb
       with_fileglob:
-        - /var/lib/mongodb/*
+        - "{{ mongodb_varlib }}/*"
 ## {"failed": true, "item": "/var/lib/mongodb/local.ns", "msg": "file (/var/lib/mongodb/local.ns) is absent, cannot continue", "path": "/var/lib/mongodb/local.ns", "state": "absent"}
       ignore_errors: true
   when: mongodblib.stat.exists

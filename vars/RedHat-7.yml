@@ -33,4 +33,5 @@ ssl_private: /etc/pki/tls/private
 ssl_group: root
 
 mongodb_svc: mongod
+mongodb_varlib: /var/lib/mongo
 

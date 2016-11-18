@@ -38,9 +38,15 @@
     dest=/opt/hpfeeds
   when: not githpfeeds.stat.exists
 
+## FIXME! v2.2: https://github.com/ansible/ansible-modules-core/issues/5470
+- name: Install hpfeeds virtualenv - initiate virtualenv because of bug, install modules after
+  pip: name=cffi state=present virtualenv=/opt/hpfeeds/env
 - name: Install hpfeeds virtualenv
-  pip: name="{{item}}" state=present
-    virtualenv=/opt/hpfeeds/env
+  pip:
+    name: "{{item}}"
+    state: present
+#    virtualenv: /opt/hpfeeds/env
+    executable: /opt/hpfeeds/env/bin/pip
   with_items:
     - cffi
 ## FIXME! AssertionError: sorry, but this version only supports 100 named groups + Current: 16.2.0 ~ 0.16.2/same error
@@ -52,7 +58,8 @@
     - git+https://github.com/rep/evnet.git#egg=evnet-dev
     - file:///opt/hpfeeds
 
-- file: path=/var/log/mhn state=directory mode=755
+- name: ensure appropriate permissions for /var/log/mhn
+  file: path=/var/log/mhn state=directory mode=755
 
 - name: set hpfeeds supervisor config
   copy: "src=hpfeeds-broker.conf dest={{ supervisor_confdir }}/hpfeeds-broker.{{ supervisor_ext }} mode=0644"

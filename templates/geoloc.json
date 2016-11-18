@@ -4,6 +4,7 @@
     "IDENT": "geoloc", 
     "SECRET": "{{ SECRET }}",
     "CHANNELS": [
+        "amun.events",
         "dionaea.connections",
         "dionaea.capture",
         "glastopf.events",
@@ -12,7 +13,8 @@
         "cowrie.sessions",
         "conpot.events",
         "snort.alerts",
-        "amun.events",
+        "kippo.alerts",
+        "cowrie.alerts",
         "wordpot.events",
         "shockpot.events",
         "p0f.events",

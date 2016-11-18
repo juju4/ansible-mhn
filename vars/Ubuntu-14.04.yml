@@ -35,3 +35,4 @@ ssl_private: /etc/ssl/private
 ssl_group: ssl-cert
 
 mongodb_svc: mongod
+mongodb_varlib: /var/lib/mongodb

@@ -23,8 +23,15 @@ platforms:
   - name: ubuntu-16.04
   - name: ubuntu-14.04
 #  - name: ubuntu-12.04
-  - name: centos-7
+#  - name: centos-7
+#    provisioner:
+### FIXME!/workaround: virtualenv bug in 2.2: https://github.com/ansible/ansible-modules-core/issues/5470
+#      ansible_version: 2.1.2.0
 #  - name: centos-6
+### Ansible 2.2+/cryptography: https://github.com/ansible/ansible/issues/276
+#    provisioner:
+#      ansible_version: 2.1.2.0
+
 ## "Failed to complete #create action: [Broken pipe] on default-alpine-34"
 ## do we have python2 in default image?
 #  - name: alpine-3.4

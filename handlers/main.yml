@@ -1,7 +1,9 @@
 ---
 
+## [WARNING]: Ignoring "sleep" as it is not used in "systemd"
 - name: supervisor update
-  service: name={{ supervisor_service }} state=restarted sleep=5
+  service: name={{ supervisor_service }} state=restarted sleep=15
+
 - name: nginx restart
   service: name=nginx state=restarted
 - name: restart ssh

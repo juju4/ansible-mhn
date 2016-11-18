@@ -46,6 +46,7 @@ CHANNELS: 'amun.events,conpot.events,thug.events,beeswarm.hive,dionaea.capture,d
 #golang_v: 1.6.3
 #golang_v: 1.7.3
 
+mhn_sent_log_to_threatstream: false
 
 backupdir: /var/_backup
 scriptsdir: /usr/local/scripts

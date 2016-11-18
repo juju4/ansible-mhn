@@ -123,8 +123,7 @@
     SECRET: "{{ rand.stdout }}"
   when: not addusergeoloc.stat.exists
 - name: add hpfeeds user for honeymap
-  command: '/opt/hpfeeds/env/bin/python /opt/hpfeeds/broker/add_user.py "geoloc" "{{ SECRET }}" "geoloc.events" "amun.events,dionaea.connections,dionaea.capture,glastopf.events,beeswarm.hive,kippo.sessions,cowrie.sessions,conpot.events,snort.alerts,kippo.alerts,cowrie.alerts,wordpot.events,shockpot.events,p0f.events,suricata.events,elastichoney.events
-"'
+  command: '/opt/hpfeeds/env/bin/python /opt/hpfeeds/broker/add_user.py "geoloc" "{{ SECRET }}" "geoloc.events" "amun.events,dionaea.connections,dionaea.capture,glastopf.events,beeswarm.hive,kippo.sessions,cowrie.sessions,conpot.events,snort.alerts,kippo.alerts,cowrie.alerts,wordpot.events,shockpot.events,p0f.events,suricata.events,elastichoney.events"'
   when: not addusergeoloc.stat.exists
 - name: Set up geoloc.json
   template: src=geoloc.json
