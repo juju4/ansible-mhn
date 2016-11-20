@@ -18,8 +18,6 @@
           template: src=mongodb.service.j2 dest=/usr/lib/systemd/system/mongod.service mode=0644
       when: ansible_service_mgr == 'systemd'
 ## http://askubuntu.com/questions/757384/can-i-use-14-04-mongodb-packages-with-16-04
-    - name: enable service mongodb
-      service: name={{ mongodb_svc }} enabled=yes state=started
 #    - name: unmask mongodb from systemctl
 #      command: "systemctl unmask mongodb"
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
@@ -64,4 +62,7 @@
 ## {"failed": true, "item": "/var/lib/mongodb/local.ns", "msg": "file (/var/lib/mongodb/local.ns) is absent, cannot continue", "path": "/var/lib/mongodb/local.ns", "state": "absent"}
       ignore_errors: true
   when: mongodblib.stat.exists
+
+- name: enable service mongodb
+  service: name={{ mongodb_svc }} enabled=yes state=started
 
