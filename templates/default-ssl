@@ -73,8 +73,11 @@ server {
     root /opt/www;
     location @mhnserver {
       include uwsgi_params;
+{% if ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux' %}
+      uwsgi_pass 127.0.0.1:9999;
+{% else %}
       uwsgi_pass unix:/tmp/uwsgi.sock;
-#      uwsgi_pass 127.0.0.1:9999;
+{% endif %}
     }
     location  /static {
       alias {{ MHN_HOME }}/server/mhn/static;

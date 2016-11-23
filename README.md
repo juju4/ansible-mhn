@@ -113,7 +113,27 @@ It happens also on mhnclient+mhn test config on Ubuntu trusty only for unknown r
 
 * Centos7: 502 Bad gateway between nginx and uwsgi.
 when switching uwsgi to http socket, web interface is accessible directly through uwsgi but still 502 on nginx.
+with curl 7.40+:
+```
+$ curl -v --unix-socket /tmp/uwsgi.sock http://localhost
+* Rebuilt URL to: http://localhost/
+*   Trying /tmp/uwsgi.sock...
+* Connected to localhost (/tmp/uwsgi.sock) port 80 (#0)
+> GET / HTTP/1.1
+> Host: localhost
+> User-Agent: curl/7.51.0
+> Accept: */*
+> 
+* Curl_http_done: called premature == 0
+* Empty reply from server
+* Connection #0 to host localhost left intact
+curl: (52) Empty reply from server
+```
+using network access, service is accessible but nginx is still returning 502.
 pending.
+
+* Travis/trusty: uptstream mongodb packages fail to install but working fine in local kitchen.
+pending
 
 
 

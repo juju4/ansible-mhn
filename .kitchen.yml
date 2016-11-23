@@ -23,9 +23,10 @@ platforms:
   - name: ubuntu-16.04
   - name: ubuntu-14.04
 #  - name: ubuntu-12.04
+## FIXME! nginx/uwsgi: 502 bad gateway
 #  - name: centos-7
 #    provisioner:
-### FIXME!/workaround: virtualenv bug in 2.2: https://github.com/ansible/ansible-modules-core/issues/5470
+## FIXME!/workaround: virtualenv bug in 2.2: https://github.com/ansible/ansible-modules-core/issues/5470
 #      ansible_version: 2.1.2.0
 #  - name: centos-6
 ### Ansible 2.2+/cryptography: https://github.com/ansible/ansible/issues/276

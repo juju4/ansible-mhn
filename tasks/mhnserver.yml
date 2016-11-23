@@ -50,15 +50,22 @@
   when: ansible_service_mgr == 'systemd'
 
 - block:
-    - name: MHN nginx configuration - http
-      template: src=default dest={{ nginx_sitedir }}/default-mhn mode=0644
-      notify:
-        - nginx restart
-    - name: MHN | Debian - enable http configuration
-      file: src={{ nginx_sitedir }}/default-mhn dest=/etc/nginx/sites-enabled/default-mhn state=link
+    - block:
+        - name: MHN nginx configuration - http
+          template: src=default dest={{ nginx_sitedir }}/default-mhn mode=0644
+          notify:
+            - nginx restart
+        - name: MHN | Debian - enable http configuration
+          file: src={{ nginx_sitedir }}/default-mhn dest=/etc/nginx/sites-enabled/default-mhn state=link
+          notify:
+            - nginx restart
       when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
-      notify:
-        - nginx restart
+    - block:
+        - name: MHN nginx configuration - http
+          template: src=default dest={{ nginx_sitedir }}/mhn.conf mode=0644
+          notify:
+            - nginx restart
+      when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
   when: mhn_httpport is defined
 
 - block:
