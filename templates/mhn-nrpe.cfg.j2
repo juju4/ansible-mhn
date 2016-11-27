@@ -8,5 +8,5 @@ command[check_procs_mhn_collector]=/usr/lib/nagios/plugins/check_procs -C python
 command[check_procs_mhn_uwsgi]=/usr/lib/nagios/plugins/check_procs -C uwsgi -u {{ mhn_user }} -w 1 -c 1
 command[check_procs_mhn_mnemosyne]=/usr/lib/nagios/plugins/check_procs -C python -a runner.py -u root -w 1 -c 1
 command[check_mhn_errors]=/usr/lib/nagios/plugins/check_log -F /var/log/mhn/mhn-collector.log -O /var/tmp/mhn-collector.tmp -q 'ERROR'
-command[check_var_lib_mongodb]=/usr/lib/nagios/plugins/count_file.pl -d /var/lib/mongodb -w 10:150 -c 5:200 -x 300000 -s 500000
+command[check_var_lib_mongodb]=/usr/lib/nagios/plugins/count_file.pl -d /var/lib/mongodb -w 30:300 -c 10:500 -x 800000 -s 1500000
 
