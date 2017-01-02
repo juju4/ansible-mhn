@@ -78,7 +78,8 @@
 ## FIXME! how to detect already run ?
 - stat: path=/opt/honeymap/client/js/honeymap.js
   register: stgo
-- command: "{{ item }} chdir=/opt/honeymap/server"
+- name: get and build honeymap server (go)
+  command: "{{ item }} chdir=/opt/honeymap/server"
   with_items:
     - go get
     - go build
@@ -86,7 +87,8 @@
     GOPATH: /opt/honeymap/server
     GOBIN: /usr/local/go/bin
   when: not stgo.stat.exists
-- command: "{{ item }} chdir=/opt/honeymap"
+- name: build honeymap server (make)
+  command: "{{ item }} chdir=/opt/honeymap"
   with_items:
     - make
   environment:
@@ -94,7 +96,8 @@
     GOBIN: /usr/local/go/bin
   when: not stgo.stat.exists
 
-- file: path=/var/log/mhn state=directory mode=755
+- name: ensure appropriate permissions on log directory
+  file: path=/var/log/mhn state=directory mode=755
 
 - name: Install hpfeeds virtualenv packages
   pip: name={{item}} state=present

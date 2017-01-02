@@ -1,4 +1,3 @@
-## /opt/hpfeeds-logger/splunk.json
 {
     "host": "localhost",
     "port": 10000,

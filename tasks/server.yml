@@ -26,6 +26,23 @@
   become: yes
   become_user: "{{ mhn_user }}"
 
+## if exists, update. for git pull, need to stash local changes
+## FIXME! is it the right way to do minor update?
+- block:
+    - name: updating existing MHN
+      command: "{{ item }}"
+      args:
+        chdir: "{{ MHN_HOME }}"
+      with_items:
+        - git config --global user.email root@localhost
+## FIXME! stash not working. requiring merging of requirements.txt
+        - git stash
+        - git pull
+        - git stash pop
+      register: gitpull_result
+      changed_when: not ("'Already up-to-date.' in gitpull_result.stdout")
+  when: mhnrepo.stat.exists and 0 == 1
+
 - name: ensure mhn log dir exists
   file: path=/var/log/mhn state=directory mode=0755
 
@@ -46,7 +63,7 @@
 - include: arcsight.yml
   when: mhn_do_arcsight is defined and mhn_do_arcsight
 - include: elk.yml
-  when: mhn_do_elk is defined and mhn_do_elk
+  when: mhn_do_elk is defined and mhn_do_elk and mhn_elk_elasticserver != ''
 
 - block:
     - file: dest=/etc/aide/aide.conf.d state=directory mode=0755

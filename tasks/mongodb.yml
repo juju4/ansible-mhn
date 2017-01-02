@@ -55,6 +55,7 @@
   stat: path="{{ mongodb_varlib }}"
   register: mongodblib
 - block:
+## FIXME! https://github.com/ansible/ansible/issues/17136
     - name: ensure appropriate permissions for /var/lib/mongodb
       file: dest={{ item }} owner=mongodb
       with_fileglob:

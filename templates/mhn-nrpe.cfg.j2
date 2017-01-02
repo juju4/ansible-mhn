@@ -1,4 +1,4 @@
-command[check_procs_supervisor]=/usr/lib/nagios/plugins/check_procs -C supervisord -u root -w 1 -c 1
+#command[check_procs_supervisor]=/usr/lib/nagios/plugins/check_procs -C supervisord -u root -w 1 -c 1
 command[check_procs_mhn_geoloc]=/usr/lib/nagios/plugins/check_procs -C python -a geoloc.py -u root -w 1 -c 1
 command[check_procs_mhn_honeymap]=/usr/lib/nagios/plugins/check_procs -C server -u root -w 1 -c 1
 command[check_procs_mhn_feedbroker]=/usr/lib/nagios/plugins/check_procs -C python -a feedbroker.py -u root -w 1 -c 1
