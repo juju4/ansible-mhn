@@ -13,5 +13,5 @@ fi
 [ ! -d $rolesdir/juju4.redhat-epel ] && git clone https://github.com/juju4/ansible-redhat-epel $rolesdir/juju4.redhat-epel
 [ ! -d $rolesdir/juju4.golang ] && git clone https://github.com/juju4/ansible-golang $rolesdir/juju4.golang
 ## galaxy naming
-[ ! -e $rolesdir/juju4.mhn ] && ln -s $rolesdir/ansible-mhn $rolesdir/juju4.mhn
+[ ! -e $rolesdir/juju4.mhn ] && ln -s ansible-mhn $rolesdir/juju4.mhn
 

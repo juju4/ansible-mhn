@@ -87,6 +87,7 @@ before_install:
   - sudo -E su $USER -c "lxc config device add run-${distribution}-${version//./} sharedroles disk path=/etc/ansible/roles source=${PWD%/*}"
   - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- mount"
   - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- pwd"
+  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- ls -l /etc/ansible/roles/"
 ## travis/trusty NOK: mongodb issue https://travis-ci.org/juju4/ansible-mhn/jobs/177444198#L3849 = doesn't help
 #  - sudo -E su $USER -c "lxc config set run-${distribution}-${version//./} security.privileged true"
 
