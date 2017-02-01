@@ -2,16 +2,18 @@
 
 - name: mongodb | add admin user
   mongodb_user:
+    database: admin
     user: "{{ mhn_mongodb_adminuser }}"
-    password: "{{ mhn_mongodb_adminpass }}
+    password: "{{ mhn_mongodb_adminpass }}"
     roles:
       - db: admin
         role: userAdminAnyDatabase
 
 - name: mongodb | add mhn user
   mongodb_user:
+    database: admin
     user: "{{ mhn_mongodb_user }}"
-    password: "{{ mhn_mongodb_pass }}
+    password: "{{ mhn_mongodb_pass }}"
     roles:
       - db: mnemosyne
         role: readWrite
