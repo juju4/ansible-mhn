@@ -124,10 +124,14 @@
   when: not addusercollector.stat.exists
 - command: '/opt/hpfeeds/env/bin/python /opt/hpfeeds/broker/add_user.py "collector" "{{ SECRET }}" "" "geoloc.events"'
   when: not addusercollector.stat.exists
-- template: src=collector.json dest={{ MHN_HOME }}/server/collector.json mode=0644
+- name: configure mhn collector
+  template: src=collector.json dest={{ MHN_HOME }}/server/collector.json mode=0644
   when: not addusercollector.stat.exists
 - file: path={{ MHN_HOME }}/.addusercollector state=touch
   when: not addusercollector.stat.exists
+
+- name: add cleaning script
+  template: src=mhn-clean-aging-data.sh.j2 dest={{ scriptsdir }}/mhn-clean-aging-data.sh mode=0755
 
 - name: set mhn-collector supervisor config
   template: "src={{ item }}.conf dest={{ supervisor_confdir }}/{{ item }}.{{ supervisor_ext }} mode=0644"
@@ -156,6 +160,8 @@
 - file: src={{ MHN_HOME }}/server/mhn.log dest=/var/log/mhn/mhn.log state=link force=yes
 - name: ensure good permissions for {{ MHN_HOME }}/server/mhn.db
   file: "path={{ MHN_HOME }}/server/mhn.db mode=0755 owner={{ mhn_user }} group={{ www_user }}"
+- name: ensure good permissions for {{ MHN_HOME }}/server/mhn/static/mhn.rules
+  file: "path={{ MHN_HOME }}/server/mhn/static/mhn.rules mode=0644 owner={{ mhn_user }} group={{ www_user }}"
 
 - name: MHN Server | ensure services are enabled and started
   service: name={{ item }} enabled=yes state=started

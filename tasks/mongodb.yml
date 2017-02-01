@@ -64,6 +64,9 @@
       ignore_errors: true
   when: mongodblib.stat.exists
 
+- include: mongodb-auth.yml
+  when: mhn_mongodb_auth
+
 - name: enable service mongodb
   service: name={{ mongodb_svc }} enabled=yes state=started
 

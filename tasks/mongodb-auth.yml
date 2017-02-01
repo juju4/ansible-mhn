@@ -1,0 +1,25 @@
+---
+
+- name: mongodb | add admin user
+  mongodb_user:
+    user: "{{ mhn_mongodb_adminuser }}"
+    password: "{{ mhn_mongodb_adminpass }}
+    roles:
+      - db: admin
+        role: userAdminAnyDatabase
+
+- name: mongodb | add mhn user
+  mongodb_user:
+    user: "{{ mhn_mongodb_user }}"
+    password: "{{ mhn_mongodb_pass }}
+    roles:
+      - db: mnemosyne
+        role: readWrite
+      - db: hpfeeds
+        role: readWrite
+
+## + /etc/mongod.conf: security.authorization: enabled (yaml file)
+##          security.javascriptEnabled: false
+
+## + edit /var/_mhn/mhn/server/mhn/common/clio.py: MongoClient
+

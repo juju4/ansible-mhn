@@ -26,3 +26,10 @@ describe command("cd /var/_mhn/mhn/server/ && /var/_mhn/mhn/env/bin/python -c 'i
   its(:exit_status) { should eq 0 }
 end
 
+describe file('/var/log/mhn/mnemosyne.log') do
+  its(:content) { should_not match /error/ }
+end
+describe file('/var/log/mhn/mhn-celery-worker.log') do
+  its(:content) { should_not match /error/ }
+end
+

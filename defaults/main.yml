@@ -23,6 +23,16 @@ honeymap_url: "https://{{ mhn_admin_web_listen }}:3000"
 curl_arg: '-k'
 mnemosyne_ignore_rfc1918: False
 
+mhn_mongodb_host: localhost
+mhn_mongodb_port: 27017
+## pull request #235 // Work in progress
+mhn_mongodb_auth: false
+mhn_mongodb_adminuser: mongodb_admin
+mhn_mongodb_adminpass: mongodb_password_to_change
+mhn_mongodb_user: mongodb_user
+mhn_mongodb_pass: mongodb_password_to_change
+mhn_mongodb_auth_mechanism: MONGODB-CR
+
 mhn_do_splunk: false
 mhn_do_arcsight: false
 

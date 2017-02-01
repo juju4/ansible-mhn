@@ -1,5 +1,6 @@
 ## aide config for mhn server and nodes
 ## server
+/var/lib/mongodb$ VarDir
 /var/lib/mongodb/mnemosyne.*$ VarFile
 /var/lib/mongodb/journal/j._*$ VarFile
 /var/lib/mongodb/journal/lsn$ VarFile
@@ -7,9 +8,13 @@
 /var/lib/mongodb/diagnostic.data/metrics.interim$ VarFile
 /var/lib/mongodb/collection-.*\.wt$ VarFile
 /var/lib/mongodb/index-.*\.wt$ VarFile
+/var/lib/mongodb/.*.turtle$ VarFile
+/var/lib/mongodb/.*.wt$ VarFile
 /var/log/mhn$ VarDir
 /var/mhn/server$ VarDir
-/var/mhn/server/mhn\.log(\.[0-9]+)?$ FreqRotLog
+/var/mhn/server/mhn\.log$ VarFile
+/var/mhn/server/mhn\.log\.[1-5]$ SerMemberLog
+#/var/mhn/server/mhn\.log(\.[0-9]+)?$ FreqRotLog
 #/var/mhn/server/mhn\.log(\.[0-9]+)?$ LowLog
 #/var/mhn/server/mhn\.log\.1\.gz$ LoSerMemberLog
 #/var/mhn/server/mhn\.log\.[2-5]\.gz$ SerMemberLog
