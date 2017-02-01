@@ -46,6 +46,12 @@
 - name: ensure mhn log dir exists
   file: path=/var/log/mhn state=directory mode=0755
 
+- name: Common directories
+  file: "dest={{ item }} mode=0755 state=directory"
+  with_items:
+    - "{{ backupdir }}"
+    - "{{ scriptsdir }}"
+
 - name: Install MHN Server - hpfeeds
   include: hpfeeds.yml
 - name: Install MHN Server - mnemosyne
@@ -72,11 +78,6 @@
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 
-- name: Common directories
-  file: "dest={{ item }} mode=0755 state=directory"
-  with_items:
-    - "{{ backupdir }}"
-    - "{{ scriptsdir }}"
 - name: setup backup configuration
   template: "src=mhn-backup.sh.j2 dest={{ scriptsdir }}/mhn-backup.sh mode=0755"
 - name: setup cron backup
