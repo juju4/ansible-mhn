@@ -23,6 +23,8 @@
     - python-virtualenv
     - git
     - openssl-devel
+    - shadowsocks-libev-devel
+    - libev
     - libev-devel
     - supervisor
   when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'

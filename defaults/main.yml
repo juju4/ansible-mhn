@@ -33,6 +33,9 @@ mhn_mongodb_user: mongodb_user
 mhn_mongodb_pass: mongodb_password_to_change
 mhn_mongodb_auth_mechanism: MONGODB-CR
 
+mhn_db_purge_limit: 30
+mhn_logrotate_days: 90
+
 mhn_do_splunk: false
 mhn_do_arcsight: false
 
@@ -43,6 +46,9 @@ mhn_elk_elasticserver: ansible_inventoryname1
 mhn_elk_elasticserver_host: 127.0.0.1
 mhn_elk_elasticserver_port: 9200
 mhn_elk_elasticserver_templatesdir: /etc/elasticsearch
+
+#mhn_webproxy: 'http://user:password@your.corporate.proxy.hostname.com:8080'
+mhn_webproxy: ''
 
 ## FIXME! missing option
 #whitelist_ip: [ ]

@@ -2,7 +2,7 @@
 ## from https://github.com/threatstream/mhn/issues/360#issuecomment-273883034
 set -e
 
-DAYS=30
+DAYS={{ mhn_db_purge_limit }}
 
 echo "[`date`] Aging off mnemosyne data ..."
 DATE=$(date -d "${DAYS} days ago" +%FT00:00:00.000Z)

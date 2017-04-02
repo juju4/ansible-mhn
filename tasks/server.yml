@@ -109,7 +109,7 @@
   when: homeuser.stat.exists
 
 - name: add mhn logrotate.d configuration
-  copy: src=logrotate-mhn dest=/etc/logrotate.d/mhn mode=0644 backup=yes
+  template: src=logrotate-mhn.j2 dest=/etc/logrotate.d/mhn mode=0644 backup=yes
 - include: monitoring-nrpe.yml
   when: mhn_monitoring_nrpe is defined and mhn_monitoring_nrpe
 

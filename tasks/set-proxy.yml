@@ -1,0 +1,39 @@
+---
+
+## https://github.com/threatstream/mhn/pull/367/commits/3cc502efaac416a0c37654682e6b8c48083a6ae4
+
+- name: configure proxy in /etc/environment
+  lineinfile:
+    dest: /etc/environment
+    regexp: "{{ item.re }}"
+    line: "{{ item.l }}"
+    backup: yes
+    create: yes
+  with_items:
+    - { re: "^ALL_PROXY=.*", l: "ALL_PROXY={{ mhn_webproxy }}" }
+    - { re: "^HTTP_PROXY=.*", l: "HTTP_PROXY={{ mhn_webproxy }}" }
+    - { re: "^HTTPS_PROXY=.*", l: "HTTPS_PROXY={{ mhn_webproxy }}" }
+    - { re: "^http_proxy=.*", l: "http_proxy={{ mhn_webproxy }}" }
+    - { re: "^https_proxy=.*", l: "https_proxy={{ mhn_webproxy }}" }
+
+- name: configure proxy for apt
+  lineinfile:
+    dest: /etc/apt/apt.conf.d/95proxies
+    regexp: "{{ item.re }}"
+    line: "{{ item.l }}"
+    backup: yes
+    create: yes
+  with_items:
+    - { re: "^Acquire::http::proxy \".*\";", l: "Acquire::http::proxy \"{{ mhn_webproxy }}\";" }
+    - { re: "^Acquire::https::proxy \".*\";", l: "Acquire::https::proxy \"{{ mhn_webproxy }}\";" }
+    - { re: "^Acquire::ftp::proxy \".*\";", l: "Acquire::ftp::proxy \"{{ mhn_webproxy }}\";" }
+
+- name: configure proxy for git
+  blockinfile:
+    dest: /root/.gitconfig
+    block: |
+      [http]
+        proxy = {{ mhn_webproxy }}
+    backup: yes
+    create: yes
+
