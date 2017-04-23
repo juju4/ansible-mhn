@@ -20,8 +20,8 @@
 ## Ansible 2.0 on xenial: https://docs.ansible.com/ansible/become.html#becoming-an-unprivileged-user
 - name: Clone MHN repository
   git:
-    repo=https://github.com/threatstream/mhn.git
-    dest={{ MHN_HOME }}
+    repo: "{{ mhn_gitrepo }}"
+    dest: "{{ MHN_HOME }}"
   when: not mhnrepo.stat.exists
   become: yes
   become_user: "{{ mhn_user }}"
