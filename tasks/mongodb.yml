@@ -67,6 +67,13 @@
 - include: mongodb-auth.yml
   when: mhn_mongodb_auth
 
+## https://medium.com/@alexbyk/mongodb-at-shared-hosting-security-surprises-c441ecb84b54
+## https://jira.mongodb.org/browse/SERVER-22829
+- name: avoid making mongodb directory word-writable even if non-shared server
+  file:
+    dest: /var/lib/mongodb
+    mode: '0750'
+
 - name: enable service mongodb
   service: name={{ mongodb_svc }} enabled=yes state=started
 
