@@ -29,6 +29,7 @@ if [ "X$USER" != "Xroot" -a "X$USER" != "X" ]; then
 else
     bash -l -c "bundle exec rake spec"
 fi
+RET=$?
 
 #ps axu | grep supervisor
 #[ X`which systemctl` != 'X' ] && systemctl status supervisor --no-pager
@@ -37,5 +38,5 @@ apt-get -f -y install
 tail -50 /var/log/syslog
 tail -50 /var/log/apt/history.log
 tail -50 /var/log/mongodb/mongod.log
-true
 
+exit $RET
