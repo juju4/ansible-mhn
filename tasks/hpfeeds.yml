@@ -54,7 +54,7 @@
 ## FIXME! AssertionError: sorry, but this version only supports 100 named groups + Current: 16.2.0 ~ 0.16.2/same error
 ## https://github.com/pyca/cryptography/issues/3187
 #    - pycparser==2.14
-    - pyopenssl==0.14
+    - pyopenssl==17.2.0
     - pymongo
 ## FIXME! never detected as installed = changed at each run
     - git+https://github.com/rep/evnet.git#egg=evnet-dev
