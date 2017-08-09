@@ -100,8 +100,15 @@ script:
   - "grep -q 'changed=0.*failed=0' /tmp/idempotency.log && (echo 'Idempotence test: pass' && exit 0) || (echo 'Idempotence test: fail' && cat /tmp/idempotency.log && exit 0)"
 
   - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- time sh -x /etc/ansible/roles/juju4.mhn/test/integration/default/serverspec/run-local-tests.sh"
+
+after_failure:
+  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- cat /var/log/mhn/hpfeeds-broker.log"
+  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- cat /var/log/mhn/hpfeeds-broker.err"
+  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- cat /var/log/mhn/mhn-collector.log"
+  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- journalctl -xe --no-pager"
+
+after_script:
   - sudo -E su $USER -c "lxc stop run-${distribution}-${version//./} --force"
 
 notifications:
   webhooks: https://galaxy.ansible.com/api/v1/notifications/
-
