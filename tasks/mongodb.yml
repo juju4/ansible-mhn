@@ -42,6 +42,7 @@
   with_items:
     - mongodb-org
   when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+  register: rpminstall
 
 ## disappeared in mongodb3, https://docs.mongodb.com/manual/tutorial/rotate-log-files/
 #- name: set log rotation for mongodb
@@ -73,6 +74,12 @@
   file:
     dest: /var/lib/mongodb
     mode: '0750'
+
+- name: RedHat7 | reload systemd
+  systemd:
+    daemon_reload: yes
+    name: "{{ mongodb_svc }}"
+  when: (ansible_os_family == 'RedHat' and ansible_distribution_version.split(".")[0] == '7') and rpminstall.changed and not (ansible_virtualization_type is defined and (ansible_virtualization_type == "docker"))
 
 - name: enable service mongodb
   service: name={{ mongodb_svc }} enabled=yes state=started
