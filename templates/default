@@ -1,3 +1,4 @@
+# {{ ansible_managed }}
 ## /etc/nginx/sites-available/default
 server {
 {% if mhn_admin_web_listen is defined and mhn_admin_web_listen != '' %}

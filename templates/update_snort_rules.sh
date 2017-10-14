@@ -1,4 +1,5 @@
 #!/bin/bash
+# {{ ansible_managed }}
 ## /etc/cron.daily/update_snort_rules.sh
 
 mkdir -p /opt/mhn/rules
