@@ -2,9 +2,7 @@
 
 mhn_user: _mhn
 mhn_userdir: /var/_mhn
-#mhn_gitrepo: https://github.com/threatstream/mhn.git
-## blocking merge https://github.com/threatstream/mhn/pull/386
-mhn_gitrepo: https://github.com/0x7fff9/mhn.git
+mhn_gitrepo: https://github.com/threatstream/mhn.git
 
 MHN_HOME: "{{ mhn_userdir }}/mhn"
 MHN_EMAIL: root@localhost
