@@ -18,7 +18,7 @@ env:
 #  - distribution: ubuntu
 #    version: 12.04
 #  - distribution: alpine
-#    version: 3.4
+#    version: 3.6
 #  - distribution: debian
 #    version: jessie
 
@@ -65,6 +65,7 @@ before_install:
   - '[ "X${distribution}" == "Xcentos" ] && sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- systemctl start sshd" || true'
 ## avoid "msg": "You (root) are not allowed to access to (crontab) because of pam configuration.\n" because of password expired in centos image
   - '[ "X${distribution}" == "Xcentos" ] && openssl passwd -in /dev/urandom | sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- passwd root --stdin" || true'
+  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- pip install --upgrade pip"
   - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- pip install ansible"
   - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- ansible --version"
   - "echo localhost > inventory"
@@ -92,7 +93,7 @@ before_install:
 
 script:
   - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- ansible-playbook -i inventory --syntax-check /etc/ansible/roles/juju4.mhn/test/integration/default/default.yml"
-  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- ansible-playbook -i inventory --connection=local --sudo -vvv /etc/ansible/roles/juju4.mhn/test/integration/default/default.yml"
+  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- ansible-playbook -i inventory --connection=local --sudo -vvvv /etc/ansible/roles/juju4.mhn/test/integration/default/default.yml"
 
 ## FIXME! Travis request: Build config file had a parse error: "mapping values are not allowed in this context at line 72 column 321".
 #  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- ansible-playbook -i inventory /etc/ansible/roles/juju4.mhn/test/integration/default/default.yml --connection=local --sudo | tee /tmp/idempotency.log | grep -q 'changed=0.*failed=0'  && (echo 'Idempotence test: pass' && exit 0) || (echo 'Idempotence test: fail' && cat /tmp/idempotency.log && exit 1)"
