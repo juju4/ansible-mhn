@@ -40,6 +40,21 @@
     dest=/opt/hpfeeds
   when: not githpfeeds.stat.exists
 
+- name: git clone evnet
+  git:
+    repo: https://github.com/rep/evnet.git
+    dest: /opt/evnet
+    update: no
+
+# urllib2.HTTPError: HTTP Error 403: SSL is required
+# https://mail.python.org/pipermail/distutils-sig/2017-October/031712.html
+- name: update evnet distribute url
+  replace:
+    dest: /opt/evnet/distribute_setup.py
+    regexp: '^DEFAULT_URL = "http://pypi.python.org'
+    replace: 'DEFAULT_URL = "https://pypi.python.org'
+    backup: yes
+
 ## FIXME! v2.2: https://github.com/ansible/ansible-modules-core/issues/5470
 - name: Install hpfeeds virtualenv - initiate virtualenv because of bug, install modules after
   pip: name=cffi state=present virtualenv=/opt/hpfeeds/env
@@ -56,11 +71,8 @@
 #    - pycparser==2.14
     - pyopenssl==17.2.0
     - pymongo
-# urllib2.HTTPError: HTTP Error 403: SSL is required
-# https://mail.python.org/pipermail/distutils-sig/2017-October/031712.html
-    - distribute==0.6.15
+    - file:///opt/evnet
 ## FIXME! never detected as installed = changed at each run
-    - git+https://github.com/rep/evnet.git#egg=evnet-dev
     - file:///opt/hpfeeds
 
 - name: ensure appropriate permissions for /var/log/mhn
