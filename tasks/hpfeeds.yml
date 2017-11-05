@@ -56,6 +56,9 @@
 #    - pycparser==2.14
     - pyopenssl==17.2.0
     - pymongo
+# urllib2.HTTPError: HTTP Error 403: SSL is required
+# https://mail.python.org/pipermail/distutils-sig/2017-October/031712.html
+    - distribute
 ## FIXME! never detected as installed = changed at each run
     - git+https://github.com/rep/evnet.git#egg=evnet-dev
     - file:///opt/hpfeeds
