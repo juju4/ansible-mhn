@@ -1,5 +1,6 @@
 ---
 ## https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/
+
 - block:
     - name: Apt | Add Mongodb repository key
       apt_key: keyserver=hkp://keyserver.ubuntu.com:80 id=EA312927
@@ -20,7 +21,7 @@
 ## http://askubuntu.com/questions/757384/can-i-use-14-04-mongodb-packages-with-16-04
 #    - name: unmask mongodb from systemctl
 #      command: "systemctl unmask mongodb"
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+  when: ansible_os_family == 'Debian'
 
 ## https://docs.mongodb.com/manual/tutorial/install-mongodb-on-red-hat/
 - block:
@@ -29,19 +30,19 @@
       rpm_key: key=https://www.mongodb.org/static/pgp/server-3.2.asc state=present
     - name: install mongodb yum repository
       template: src=mongodb.repo.j2 dest=/etc/yum.repos.d/mongodb.repo mode=0644
-  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+  when: ansible_os_family == "RedHat"
 
 - name: apt | Install mongodb
   apt: name={{item}} state=present update_cache=yes cache_valid_time=3600
   with_items:
     - mongodb-org
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+  when: ansible_os_family == 'Debian'
 
 - name: yum | Install mongodb
   yum: name={{item}} state=present update_cache=yes
   with_items:
     - mongodb-org
-  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+  when: ansible_os_family == "RedHat"
   register: rpminstall
 
 ## disappeared in mongodb3, https://docs.mongodb.com/manual/tutorial/rotate-log-files/
@@ -58,7 +59,9 @@
 - block:
 ## FIXME! https://github.com/ansible/ansible/issues/17136
     - name: ensure appropriate permissions for /var/lib/mongodb
-      file: dest={{ item }} owner=mongodb
+      file:
+        dest: "{{ item }}"
+        owner: mongodb
       with_fileglob:
         - "{{ mongodb_varlib }}/*"
 ## {"failed": true, "item": "/var/lib/mongodb/local.ns", "msg": "file (/var/lib/mongodb/local.ns) is absent, cannot continue", "path": "/var/lib/mongodb/local.ns", "state": "absent"}
@@ -72,7 +75,7 @@
 ## https://jira.mongodb.org/browse/SERVER-22829
 - name: avoid making mongodb directory word-writable even if non-shared server
   file:
-    dest: /var/lib/mongodb
+    dest: "{{ mongodb_varlib }}"
     mode: '0750'
 
 - name: RedHat7 | reload systemd
@@ -83,4 +86,3 @@
 
 - name: enable service mongodb
   service: name={{ mongodb_svc }} enabled=yes state=started
-
