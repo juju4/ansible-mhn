@@ -22,6 +22,12 @@
     virtualenv={{ MHN_HOME }}/env
   when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
 
+- name: Install python config
+  pip:
+    name: config
+    state: present
+    virtualenv: "{{ MHN_HOME }}/env"
+
 - name: check if db was initialized
   stat: path={{ MHN_HOME }}/.configdb_initialized
   register: init_done
