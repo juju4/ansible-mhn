@@ -38,4 +38,4 @@ ssl_group: ssl-cert
 mongodb_svc: mongod
 mongodb_varlib: /var/lib/mongodb
 mhn_mongodb_pkg:
-    - mongodb-org
+    - mongodb

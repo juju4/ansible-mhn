@@ -16,6 +16,7 @@ galaxy_info:
   #  - saucy
     - trusty
     - xenial
+    - bionic
   #  - all
   #  - etch
   #  - lenny
@@ -30,4 +31,3 @@ dependencies:
     - juju4.redhat-epel
     - juju4.maxmind
     - juju4.golang
-

@@ -5,11 +5,11 @@
     - name: Apt | Add Mongodb repository key
       apt_key: keyserver=hkp://keyserver.ubuntu.com:80 id=EA312927
     - name: Debian | Add Mongodb repository
-      apt_repository: repo='deb http://repo.mongodb.org/apt/{{ ansible_distribution|lower }} {{ ansible_distribution_release }}/mongodb-org/3.2 main' state=present
+      apt_repository: repo='deb http://repo.mongodb.org/apt/{{ ansible_distribution|lower }} {{ ansible_distribution_release }}/mongodb-org/3.6 main' state=present
       when: ansible_distribution == 'Debian'
     - name: Ubuntu | Add Mongodb repository
-      apt_repository: repo='deb http://repo.mongodb.org/apt/{{ ansible_distribution|lower }} {{ ansible_distribution_release }}/mongodb-org/3.2 multiverse' state=present
-      when: ansible_distribution == 'Ubuntu'
+      apt_repository: repo='deb http://repo.mongodb.org/apt/{{ ansible_distribution|lower }} {{ ansible_distribution_release }}/mongodb-org/3.6 multiverse' state=present
+      when: ansible_distribution == 'Ubuntu' and ansible_distribution_release != 'bionic'
     - block:
         - name: ensure systemd config directory exists
           file: dest=/usr/lib/systemd/system state=directory mode=0755
@@ -27,15 +27,14 @@
 - block:
 ## FIXME! fails sometimes 'Package mongodb-org-3.2.10-1.el7.x86_64.rpm is not signed'... https://jira.mongodb.org/browse/SERVER-26583
     - name: install mongodb rpm key
-      rpm_key: key=https://www.mongodb.org/static/pgp/server-3.2.asc state=present
+      rpm_key: key=https://www.mongodb.org/static/pgp/server-3.6.asc state=present
     - name: install mongodb yum repository
       template: src=mongodb.repo.j2 dest=/etc/yum.repos.d/mongodb.repo mode=0644
   when: ansible_os_family == "RedHat"
 
 - name: apt | Install mongodb
   apt: name={{item}} state=present update_cache=yes cache_valid_time=3600
-  with_items:
-    - mongodb-org
+  with_items: "{{ mhn_mongodb_pkg }}"
   when: ansible_os_family == 'Debian'
 
 - name: yum | Install mongodb

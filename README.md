@@ -15,11 +15,13 @@ It was tested on the following versions:
  * 2.0
  * 2.1
  * 2.2
+ * 2.5
 
 ### Operating systems
 
 Tested with Ubuntu 14.04, 16.04 and CentOS 7
 Ubuntu 12.04 is supported in official MHN scripts but with libev compiled from source (pyev require 4.15+, precise only has 4.11). In the same way, Centos6 requires source install of libev and python 2.7. Both are not included in this role currently.
+Initial testing for Ubuntu 18.04.
 
 ## Example Playbook
 
@@ -29,11 +31,11 @@ For example
 ```
 - hosts: mhnserver
   roles:
-      - maxmind
-      - mhn
+      - juju4.maxmind
+      - juju4.mhn
 - hosts: mhnclient
   roles:
-    - { role: mhnclient, mhnclient_dionaea: true, mhnclient_glastopf: true, mhnclient_wordpot: true }
+    - { role: juju4.mhnclient, mhnclient_dionaea: true, mhnclient_glastopf: true, mhnclient_wordpot: true }
 ```
 
 If you use kippo, after first execution, you must change ssh port in your inventory file (manual inventory or vagrant .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory) or Vagrantfile (config.ssh.port) else you will have no connection. Eventually, you can override it from ansible command line (-e).
@@ -157,14 +159,14 @@ Default kitchen config (.kitchen.yml) is lxd-based, while (.kitchen.vagrant.yml)
 
 Once you ensured all necessary roles are present, You can test with:
 ```
-$ cd /path/to/roles/mhn
+$ cd /path/to/roles/juju4.mhn
 $ kitchen verify
 $ kitchen login
 $ KITCHEN_YAML=".kitchen.vagrant.yml" kitchen verify
 ```
 or
 ```
-$ cd /path/to/roles/mhn/test/vagrant
+$ cd /path/to/roles/juju4.mhn/test/vagrant
 $ vagrant up
 $ vagrant ssh
 ```
