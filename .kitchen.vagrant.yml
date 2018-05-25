@@ -13,7 +13,7 @@ provisioner:
   ansible_verbose: false
   ansible_verbosity: 2
   ansible_extra_flags: <%= ENV['ANSIBLE_EXTRA_FLAGS'] %>
-#  name: chef_solo
+  ansible_cfg_path: test/vagrant/ansible.cfg
 
 platforms:
   - name: ubuntu-18.04
