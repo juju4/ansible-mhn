@@ -5,9 +5,19 @@
   with_items: "{{ mhnserver_pkg }}"
 
 ## FIXME! xenial: https://github.com/unbit/uwsgi/issues/1262
-- name: fix bug uwsgi and xenial
+- name: Ubuntu 16.04+ | fix bug uwsgi
   replace: dest={{ MHN_HOME }}/server/requirements.txt regexp='^uWSGI.*' replace='uWSGI'
-  when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'xenial'
+  when: ansible_distribution == 'Ubuntu' and (ansible_distribution_release == 'xenial' or ansible_distribution_release == 'bionic')
+
+# https://stackoverflow.com/questions/49627807/cryptacular-is-broken
+# default is bcrypt 2.0.0 vs last 3.1.4/oct 2017
+- name: Ubuntu 18.04 | update pip requirements.txt for bcrypt
+  replace:
+    dest: "{{ MHN_HOME }}/server/requirements.txt"
+    regexp: '^bcrypt==.*'
+    replace: 'bcrypt'
+    backup: yes
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'bionic'
 
 #- name: Install mhnserver virtualenv pycparser BUG https://github.com/pyca/cryptography/issues/3187
 #  pip: name=pycparser version=2.14
