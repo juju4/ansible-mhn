@@ -7,7 +7,11 @@ describe process("mongod") do
   it { should be_running }
 end
 
-describe service('mongod') do  
+describe service('mongodb'), :if => os[:family] == 'ubuntu' && os[:release] == '18.04' do
+  it { should be_enabled }
+  it { should be_running }
+end
+describe service('mongod'), :if => os[:family] != 'ubuntu' || os[:release] != '18.04' do
   it { should be_enabled }
   it { should be_running }
 end
