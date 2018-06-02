@@ -73,7 +73,8 @@
     - pyopenssl==17.2.0
     - pymongo
 # 201802 lost https://pypi.python.org/pypi/pyev/ ?
-    - git+https://github.com/HurricaneLabs/pyev#egg=pyev
+#   https://github.com/threatstream/mhn/issues/560
+    - git+https://github.com/couozu/pyev#egg=pyev
     - file:///opt/evnet
 ## FIXME! never detected as installed = changed at each run
     - file:///opt/hpfeeds
