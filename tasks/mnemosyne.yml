@@ -48,14 +48,21 @@
   shell: "openssl rand -base64 48 | sed 's@[=\\/\\+]@@g;'"
   changed_when: false
   register: rand
+  no_log: true
 - set_fact:
     SECRET: "{{ rand.stdout }}"
   when: not addusermnemosyne.stat.exists
+  no_log: true
+
 - name: ensure mongdb is active
   service: name={{ mongodb_svc }} state=started
+  when: not (ansible_virtualization_type is defined and (ansible_virtualization_type == "docker"))
+
 - name: add user to hpfeeds
   command: '/opt/hpfeeds/env/bin/python /opt/hpfeeds/broker/add_user.py "{{ IDENT }}" "{{ SECRET }}" "" "{{ CHANNELS }}"'
   when: not addusermnemosyne.stat.exists
+  no_log: true
+
 - name: Set up mnemosyne config
   template: src=mnemosyne.cfg
     dest=/opt/mnemosyne/mnemosyne.cfg
