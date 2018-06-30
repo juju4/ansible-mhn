@@ -8,11 +8,11 @@
 
 # urllib2.HTTPError: HTTP Error 403: SSL is required
 # https://mail.python.org/pipermail/distutils-sig/2017-October/031712.html
-- name: update distribute version 0.6.14 to 0.7.3 - fixing repo url?
+- name: update distribute version 0.6.14 to 0.6.49 - fixing repo url?
   replace:
     dest: /opt/hpfeeds-logger-git/ez_setup.py
     regexp: '^DEFAULT_VERSION = ".*"'
-    replace: 'DEFAULT_VERSION = "0.7.3"'
+    replace: 'DEFAULT_VERSION = "0.6.49"'
     backup: yes
 
 - name: Install hpfeeds-logger virtualenv
