@@ -3,8 +3,9 @@
 # MHN Server ansible role
 
 Mostly a conversion of the shell scripts of https://github.com/threatstream/mhn to ansible config
-https://github.com/threatstream/mhn/
-http://www.505forensics.com/honeypot-data-part-1-mongodb-elasticsearch-mhn/
+
+* https://github.com/threatstream/mhn/
+* http://www.505forensics.com/honeypot-data-part-1-mongodb-elasticsearch-mhn/
 
 As stated in MHN FAQ, you need proper updates and hardening for those systems. (other roles)
 
