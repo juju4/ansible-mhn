@@ -5,6 +5,7 @@
     - MHN_EMAIL: root@localhost
     - MHN_PASS: root@localhost
     - mhn_do_elk: true
+    - mhn_no_log: false
   roles:
     - juju4.maxmind
     - juju4.mhn

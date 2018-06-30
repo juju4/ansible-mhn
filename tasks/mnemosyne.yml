@@ -48,11 +48,11 @@
   shell: "openssl rand -base64 48 | sed 's@[=\\/\\+]@@g;'"
   changed_when: false
   register: rand
-  no_log: true
+  no_log: "{{ mhn_no_log }}"
 - set_fact:
     SECRET: "{{ rand.stdout }}"
   when: not addusermnemosyne.stat.exists
-  no_log: true
+  no_log: "{{ mhn_no_log }}"
 
 - name: ensure mongdb is active
   service: name={{ mongodb_svc }} state=started
@@ -61,7 +61,7 @@
 - name: add user to hpfeeds
   command: '/opt/hpfeeds/env/bin/python /opt/hpfeeds/broker/add_user.py "{{ IDENT }}" "{{ SECRET }}" "" "{{ CHANNELS }}"'
   when: not addusermnemosyne.stat.exists
-  no_log: true
+  no_log: "{{ mhn_no_log }}"
 
 - name: Set up mnemosyne config
   template: src=mnemosyne.cfg

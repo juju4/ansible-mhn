@@ -69,4 +69,4 @@ backupdir: /var/_backup
 scriptsdir: /usr/local/scripts
 noreboot: true
 mhn_monitoring_nrpe: true
-
+mhn_no_log: true

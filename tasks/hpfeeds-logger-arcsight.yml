@@ -32,14 +32,14 @@
 - name: create a secret
   shell: "python -c 'import uuid;print str(uuid.uuid4()).replace(\"-\",\"\")' | tee /root/.mhn_{{ IDENT }}"
   when: not sstat.stat.exists
-  no_log: true
+  no_log: "{{ mhn_no_log }}"
 - name: recover existing hpfeeds secret
   command: "cat /root/.mhn_{{ IDENT }}"
 ## OR
 #- command: python /opt/hpfeeds/broker/get_secret.py {{ IDENT }}
   register: SECRET
   changed_when: false
-  no_log: true
+  no_log: "{{ mhn_no_log }}"
 - name: configure CHANNELS
   set_fact:
     CHANNELS: 'amun.events,dionaea.connections,dionaea.capture,glastopf.events,beeswarm.hive,kippo.sessions,cowrie.sessions,,conpot.events,snort.alerts,suricata.events,wordpot.events,shockpot.events,p0f.events,elastichoney.events'
