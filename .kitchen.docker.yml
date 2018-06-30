@@ -36,3 +36,6 @@ suites:
   - name: default
     run_list:
     attributes:
+  - name: default-logger-json
+    run_list:
+    attributes:
