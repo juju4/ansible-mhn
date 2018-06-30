@@ -88,7 +88,7 @@
   when: not (ansible_virtualization_type is defined and (ansible_virtualization_type == "docker"))
 
 - name: Docker | start service mongodb
-  command: "/usr/bin/mongod --config /etc/mongod.conf --fork"
+  command: "/usr/bin/mongod --config {{ mongodb_conf }} --fork"
   become: yes
   become_user: mongodb
   ignore_errors: true

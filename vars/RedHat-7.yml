@@ -34,4 +34,5 @@ ssl_group: root
 
 mongodb_svc: mongod
 mongodb_varlib: /var/lib/mongo
+mongodb_conf: /etc/mongod.conf
 
