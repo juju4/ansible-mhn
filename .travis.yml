@@ -20,7 +20,7 @@ env:
 #  - distribution: ubuntu
 #    version: 12.04
 #  - distribution: alpine
-#    version: 3.6
+#    version: 3.7
 #  - distribution: debian
 #    version: jessie
 
