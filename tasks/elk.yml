@@ -1,5 +1,14 @@
 ---
 
+- name: ensure elk directories exist
+  file:
+    dest: "{{ item }}"
+    mode: '0755'
+    state: directory
+  with_items:
+    - /etc/logstash/conf.d
+    - "{{ mhn_elk_elasticserver_templatesdir }}"
+
 - name: deploy mhn logstash configuration on logstash server
   template: src=logstash-mhn.conf.j2 dest=/etc/logstash/conf.d/90-mhn.conf mode=0644 backup=yes
 #  delegate_to: "{{ mhn_elk_logstashserver }}"
@@ -8,7 +17,7 @@
 
 - name: deploy mhn elasticsearch template on elastic server
   template: "src=logstash-mhn.conf.j2 dest={{ mhn_elk_elasticserver_templatesdir }}/logstash-mhn.conf mode=0644 backup=yes"
-  delegate_to: "{{ mhn_elk_elasticserver }}"
-#  notify:
-#    - restart elasticsearch
+#  delegate_to: "{{ mhn_elk_elasticserver }}"
+  notify:
+    - restart elasticsearch
 
