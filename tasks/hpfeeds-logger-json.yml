@@ -21,12 +21,7 @@
     - GeoIP-devel
   when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
 
-
-- name: Install hpfeeds-logger-json virtualenv
-  pip: name="{{ item }}"
-    virtualenv=/opt/hpfeeds-logger
-  with_items:
-    - hpfeeds-logger==0.0.7.2
+- include: hpfeeds-logger.yml
 
 - name: configure IDENT
   set_fact:

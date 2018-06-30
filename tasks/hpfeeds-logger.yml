@@ -1,0 +1,24 @@
+---
+
+- name: git clone hpfeeds-logger
+  git:
+    repo: https://github.com/threatstream/hpfeeds-logger.git
+    dest: /opt/hpfeeds-logger-git
+    update: no
+
+# urllib2.HTTPError: HTTP Error 403: SSL is required
+# https://mail.python.org/pipermail/distutils-sig/2017-October/031712.html
+- name: update distribute version 0.6.14 to 0.7.3 - fixing repo url?
+  replace:
+    dest: /opt/hpfeeds-logger-git/ez_setup.py
+    regexp: '^DEFAULT_VERSION = ".*"'
+    replace: 'DEFAULT_VERSION = "0.7.3"'
+    backup: yes
+
+- name: Install hpfeeds-logger virtualenv
+  pip:
+    name: "{{ item }}"
+    virtualenv: /opt/hpfeeds-logger
+  with_items:
+#    - hpfeeds-logger==0.0.7.3
+    - file:///opt/hpfeeds-logger-git
