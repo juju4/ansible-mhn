@@ -45,3 +45,6 @@ suites:
   - name: default-logger-json
     run_list:
     attributes:
+    includes:
+      - ubuntu-16.04
+      - ubuntu-14.04
