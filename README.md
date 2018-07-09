@@ -153,6 +153,9 @@ You can use geerlingguy.logstash role to set it up
 * Alternatives
 http://dtag-dev-sec.github.io/mediator/feature/2016/03/11/t-pot-16.03.html
 
+* Ubuntu bionic not supported - cursor issue.
+bionic has mongodb 3.6 in official repository and mongodb 3.4 community repository is not available.
+
 ## Continuous integration
 
 This role has a travis basic test (for github), more advanced with kitchen and also a Vagrantfile (test/vagrant).
