@@ -37,6 +37,6 @@ ssl_group: ssl-cert
 
 mongodb_svc: mongod
 mongodb_varlib: /var/lib/mongodb
-mongodb_conf: /etc/mongod.conf
+mongodb_conf: /etc/mongodb.conf
 mhn_mongodb_pkg:
-    - mongodb-org
+    - mongodb
