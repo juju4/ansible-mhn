@@ -112,9 +112,9 @@
 - name: symlink maxmind roles files where expected
   file: "src=/var/maxmind/{{ item }}.dat dest=/opt/{{ item }}.dat state=link"
   with_items:
-    - GeoLiteCity
+#    - GeoLiteCity
     - GeoLiteCityv6
-    - GeoIPASNum
+#    - GeoIPASNum
 
 - stat: path={{ MHN_HOME }}/.addusergeoloc
   register: addusergeoloc
