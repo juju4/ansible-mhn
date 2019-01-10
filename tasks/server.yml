@@ -58,6 +58,7 @@
   include: mnemosyne.yml
 - name: Install MHN Server - honeymap
   include: honeymap.yml
+  when: mhn_honeymap
 - name: Install MHN Server - mhnserver
   include: mhnserver.yml
 

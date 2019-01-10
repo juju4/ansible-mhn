@@ -18,6 +18,7 @@ certinfo: '/C=US/ST=CA/L=San Francisco/O=Ansible'
 #server_url: "http://{{ mhn_admin_web_listen }}"
 ## if https
 server_url: "https://{{ mhn_admin_web_listen }}:{{ mhn_httpsport }}"
+mhn_honeymap: false
 honeymap_url: "https://{{ mhn_admin_web_listen }}:3000"
 ## if self-signed certificate
 #curl_arg: ''

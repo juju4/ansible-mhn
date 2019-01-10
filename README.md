@@ -65,6 +65,7 @@ Most important are
 
 ## Known Issues
 
+* Since Jan 2019, maxmind has [discontinued geolite legacy](https://support.maxmind.com/geolite-legacy-discontinuation-notice/). It is still used by honeymap.
 * for some reason, honeymap doesn't work on https but is ok on http
 * deploy scripts for suricata/bro where not converted as there are already ansible playbooks for that and their usage is much larger than honeynet, so reuse them. snort has been converted as it is threatstream repository's one.
 * splunk, arcsight and elk part are work in progress and not fully done/tested. server deployment should be separated. Integration part needs to be build.
