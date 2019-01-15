@@ -1,5 +1,5 @@
-# {{ ansible_managed }}
-## /etc/nginx/sites-available/default-ssl
+{{ ansible_managed | comment }}
+# /etc/nginx/sites-available/default-ssl
 #
 # HTTPS server
 #

@@ -1,4 +1,4 @@
-# {{ ansible_managed }}
+{{ ansible_managed | comment }}
 ## /etc/supervisor/conf.d/hpfeeds-logger-json.conf
 [program:hpfeeds-logger-json]
 command=/opt/hpfeeds-logger/bin/hpfeeds-logger json.json

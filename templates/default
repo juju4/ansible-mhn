@@ -1,5 +1,6 @@
-# {{ ansible_managed }}
+{{ ansible_managed | comment }}
 ## /etc/nginx/sites-available/default
+
 server {
 {% if mhn_admin_web_listen is defined and mhn_admin_web_listen != '' %}
     listen {{ mhn_admin_web_listen }}:{{ mhn_httpport }};

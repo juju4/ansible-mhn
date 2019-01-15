@@ -1,5 +1,5 @@
 #!/bin/sh
-# {{ ansible_managed }}
+{{ ansible_managed | comment }}
 ## /opt/kippo/start.sh
 
 cd /opt/kippo
