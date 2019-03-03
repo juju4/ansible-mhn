@@ -57,14 +57,20 @@ before_install:
   - sudo zpool list
   - sudo lxc profile device add default root disk path=/ pool=pool1
   - sudo lxc profile show default
+
+  - sudo pip install ansible
+  - gem install kitchen
+  - gem install kitchen-ansible
+  - gem install kitchen-sync
+  - gem install kitchen-lxd_cli
+  - gem list
+  - which kitchen
 ## ssh key for lxd_cli ?
   - ls ~/.ssh
   - ssh-keygen -t rsa -b 2048 -f ~/.ssh/id_rsa -P ""
 ## sudo/su get us a non-usual PATH ...
   - '[ "X${distribution}" == "Xcentos" ] && sudo -E su $USER -c "sh -x ./test/lxd/centos-ssh-image.sh" || true'
   - sudo -E su $USER -c "env"
-## The command "sudo -E su $USER -c "which kitchen"" failed and exited with 1 during .
-#  - sudo -E su $USER -c "which kitchen"
   - sudo -E su $USER -c "env PATH=$PATH kitchen diagnose --all"
 #  - sudo -E su $USER -c "kitchen diagnose --all"
 #  - sudo -E -u $USER kitchen diagnose --all
@@ -73,6 +79,9 @@ script:
 #  - KITCHEN_LOCAL_YAML=.kitchen.local.yml bundle exec kitchen verify ${INSTANCE}
   - sudo -E su $USER -c "env PATH=$PATH kitchen verify ${suite}-${distribution}-${version//./} -l debug || (cat $HOME/.kitchen/logs/${suite}-${distribution}-${version//./}.log; find /tmp/kitchen)"
 
+#after_failure:
+#  - "systemctl -l status"
+#  - "journalctl -xe --no-pager"
+
 notifications:
   webhooks: https://galaxy.ansible.com/api/v1/notifications/
-
