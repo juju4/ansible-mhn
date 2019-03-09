@@ -65,6 +65,7 @@
   register: job_result
   until: job_result.finished
   retries: 30
+  delay: 30
 - name: add marker for db as initialized
   file: path={{ MHN_HOME }}/.configdb_initialized state=touch
   when: not config_done.stat.exists or not init_done.stat.exists
