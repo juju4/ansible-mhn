@@ -23,3 +23,8 @@
   with_items:
 #    - hpfeeds-logger==0.0.7.3
     - file:///opt/hpfeeds-logger-git
+
+- name: Configure hpfeeds-logger requirements
+  pip:
+    requirements: /opt/hpfeeds-logger-git/requirements.txt
+    virtualenv: /opt/hpfeeds-logger
