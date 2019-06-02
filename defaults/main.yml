@@ -44,7 +44,7 @@ mhn_do_arcsight: false
 mhn_do_elk: false
 ## first two are ansible inventory name (for delegate_to), next is hostname/ip
 #mhn_elk_logstashserver: ansible_inventoryname1
-mhn_elk_elasticserver: ansible_inventoryname1
+mhn_elk_elasticserver: localhost
 mhn_elk_elasticserver_host: 127.0.0.1
 mhn_elk_elasticserver_port: 9200
 mhn_elk_elasticserver_templatesdir: /etc/elasticsearch
