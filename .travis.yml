@@ -58,8 +58,8 @@ before_install:
   - sudo lxc profile device add default root disk path=/ pool=pool1
   - sudo lxc profile show default
 
-  - sudo pip install ansible
-  - gem install kitchen
+  - sudo pip install ansible ansible-lint
+  - gem install test-kitchen --version "=1.25.0"
   - gem install kitchen-ansible
   - gem install kitchen-sync
   - gem install kitchen-lxd_cli
