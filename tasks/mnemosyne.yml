@@ -1,24 +1,29 @@
 ---
 
 - name: apt | Install mnemosyne dependencies
-  apt: name={{ item }} state=present update_cache=yes cache_valid_time=3600
-  with_items:
-    - python-pip
-    - python-dev
-    - git
-    - python-virtualenv
-    - supervisor
+  apt:
+    name:
+      - python-pip
+      - python-dev
+      - git
+      - python-virtualenv
+      - supervisor
+    state: present
+    update_cache: yes
+    cache_valid_time: 3600
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 - name: yum | Install mnemosyne dependencies
-  yum: name={{ item }} state=present update_cache=yes
-  with_items:
-    - "@Development tools"
-    - python-pip
-    - python-devel
-    - python-virtualenv
-    - git
-    - supervisor
+  yum:
+    name:
+      - "@Development tools"
+      - python-pip
+      - python-devel
+      - python-virtualenv
+      - git
+      - supervisor
+    state: present
+    update_cache: yes
   when: ansible_os_family == "RedHat"
 
 - name: install mongodb

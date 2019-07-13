@@ -1,32 +1,37 @@
 ---
 
 - name: apt | Install hpfeeds dependencies
-  apt: name={{ item }} state=present update_cache=yes cache_valid_time=3600
-  with_items:
-    - libffi-dev
-    - build-essential
-    - python-pip
-    - python-dev
-    - git
-    - libssl-dev
-    - python-virtualenv
-    - libev-dev
-    - supervisor
+  apt:
+    name:
+      - libffi-dev
+      - build-essential
+      - python-pip
+      - python-dev
+      - git
+      - libssl-dev
+      - python-virtualenv
+      - libev-dev
+      - supervisor
+    state: present
+    update_cache: yes
+    cache_valid_time: 3600
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 - name: yum | Install hpfeeds dependencies
-  yum: name={{ item }} state=present update_cache=yes
-  with_items:
-    - "@Development tools"
-    - libffi-devel
-    - python-devel
-    - python-virtualenv
-    - git
-    - openssl-devel
-    - shadowsocks-libev-devel
-    - libev
-    - libev-devel
-    - supervisor
+  yum:
+    name:
+      - "@Development tools"
+      - libffi-devel
+      - python-devel
+      - python-virtualenv
+      - git
+      - openssl-devel
+      - shadowsocks-libev-devel
+      - libev
+      - libev-devel
+      - supervisor
+    state: present
+    update_cache: yes
   when: ansible_os_family == "RedHat"
 
 - name: install mongodb
