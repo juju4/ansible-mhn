@@ -1,4 +1,5 @@
 ---
+
 - name: MHN Client | registration
 #  get_url: "url={{ server_url }}/static/registration.txt dest=/root/registration.sh mode=0700"
 #- command: 'bash /root/registration.sh {{ server_url }} {{ deploy_key }} "wordpot"'
@@ -20,7 +21,7 @@
   changed_when: False
 
 - name: Ubuntu | Install wordpot dependencies
-  apt: name={{item}} state=present update_cache=yes cache_valid_time=3600
+  apt: name={{ item }} state=present update_cache=yes cache_valid_time=3600
   with_items:
     - git
     - supervisor
@@ -29,13 +30,13 @@
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 - name: yum | Install wordpot dependencies
-  yum: name={{item}} state=present update_cache=yes
+  yum: name={{ item }} state=present update_cache=yes
   with_items:
     - git
     - supervisor
     - python-pip
     - python-virtualenv
-  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+  when: ansible_os_family == "RedHat"
 
 - stat: path=/opt/wordpot
   register: wordpotdir
@@ -69,5 +70,3 @@
   copy: "src=wordpot.conf dest={{ supervisor_confdir }}/wordpot.{{ supervisor_ext }} mode=0644"
   notify:
     - supervisor update
-
-

@@ -1,4 +1,5 @@
 ---
+
 - name: MHN Client | registration
   include: registration.yml honeypot=conpot
 - set_fact:
@@ -17,45 +18,50 @@
   changed_when: False
 
 - name: Ubuntu | Install conpot dependencies
-  apt: name={{item}} state=present update_cache=yes cache_valid_time=3600
-  with_items:
-    - git
-    - libsmi2ldbl
-    - snmp-mibs-downloader
-    - python-pip
-    - python-dev
-    - libxml2-dev
-    - libxslt-dev
-    - libmysqlclient-dev
-    - zlib1g-dev
-    - python-virtualenv
-    - supervisor
+  apt:
+    name:
+      - git
+      - libsmi2ldbl
+      - snmp-mibs-downloader
+      - python-pip
+      - python-dev
+      - libxml2-dev
+      - libxslt-dev
+      - libmysqlclient-dev
+      - zlib1g-dev
+      - python-virtualenv
+      - supervisor
+    state: present
+    update_cache: yes
+    cache_valid_time: 3600
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 - name: yum | Install conpot dependencies
-  yum: name={{item}} state=present update_cache=yes
-  with_items:
-    - git
-    - supervisor
-    - python-pip
-    - python-devel
-    - python-virtualenv
-    - libxml2-devel
-    - libxslt-devel
-    - mariadb-devel
-    - zlib-devel
+  yum:
+    name:
+      - git
+      - supervisor
+      - python-pip
+      - python-devel
+      - python-virtualenv
+      - libxml2-devel
+      - libxslt-devel
+      - mariadb-devel
+      - zlib-devel
 ## FIXME! rpm not available
-#    - libsmi2ldbl
-#    - snmp-mibs-downloader
-  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+#      - libsmi2ldbl
+#      - snmp-mibs-downloader
+    state: present
+    update_cache: yes
+  when: ansible_os_family == "RedHat"
 
-- pip: name="{{ item }}"
-  with_items:
-    - distribute
+- name: Ensure distribute is present
+  pip: name=distribute state=present
 
 - name: Install conpot virtualenv
-  pip: name="{{ item }}"
-    virtualenv=/opt/conpot/env
+  pip:
+    name: "{{ item }}"
+    virtualenv: /opt/conpot/env
   with_items:
     - setuptools
     - git+https://github.com/threatstream/hpfeeds.git#egg=hpfeeds-dev
@@ -68,5 +74,3 @@
   copy: "src=conpot.conf dest={{ supervisor_confdir }}/conpot.{{ supervisor_ext }} mode=0644"
   notify:
     - supervisor update
-
-

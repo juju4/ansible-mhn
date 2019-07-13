@@ -3,7 +3,7 @@
 - include: redhat-sudotty.yml
 
 - name: yum | Install MHN server dependencies
-  yum: name={{item}} state=present
+  yum: name={{ item }} state=present
   with_items:
     - git
     - python-pip
@@ -17,4 +17,3 @@
     - pyOpenSSL
 #    - python2-ndg_httpsclient
     - python-pyasn1
-

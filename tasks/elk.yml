@@ -20,4 +20,3 @@
 #  delegate_to: "{{ mhn_elk_elasticserver }}"
   notify:
     - restart elasticsearch
-

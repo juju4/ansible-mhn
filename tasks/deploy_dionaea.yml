@@ -1,4 +1,5 @@
 ---
+
 - name: MHN Client | registration
   include: registration.yml honeypot=dionaea
 - set_fact:
@@ -18,7 +19,7 @@
 
 - block:
     - name: apt | Install dionaea dependencies
-      apt: name={{item}} state=present update_cache=yes cache_valid_time=3600
+      apt: name={{ item }} state=present update_cache=yes cache_valid_time=3600
       with_items:
         - python-software-properties
         - git
@@ -41,14 +42,14 @@
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 - name: yum | Install dionaea dependencies
-  yum: name={{item}} state=present update_cache=yes
+  yum: name={{ item }} state=present update_cache=yes
   with_items:
     - git
     - supervisor
     - patch
 ## FIXME! rpm not available
 #    - dionaea
-  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+  when: ansible_os_family == "RedHat"
 
 - template: src=dionaea.hpfeeds.patch dest=/tmp/dionaea.hpfeeds.patch mode=0644
 
@@ -90,5 +91,3 @@
   copy: "src=dionaea.conf dest={{ supervisor_confdir }}/dionaea.{{ supervisor_ext }} mode=0644"
   notify:
     - supervisor update
-
-

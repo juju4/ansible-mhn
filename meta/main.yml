@@ -10,24 +10,14 @@ galaxy_info:
     - 7
   - name: Ubuntu
     versions:
-  #  - precise
-  #  - quantal
-  #  - raring
-  #  - saucy
     - trusty
     - xenial
     - bionic
-  #  - all
-  #  - etch
-  #  - lenny
-  #  - squeeze
-  #  - wheezy
-  #  - jessie
   galaxy_tags:
     - networking
     - system
     - security
 dependencies:
-    - juju4.redhat-epel
+    - juju4.redhat_epel
     - juju4.maxmind
     - juju4.golang

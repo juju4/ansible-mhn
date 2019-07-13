@@ -1,4 +1,5 @@
 ---
+
 - name: MHN Client | registration
   include: registration.yml honeypot=elastichoney
 - set_fact:
@@ -17,7 +18,7 @@
   changed_when: False
 
 - name: Ubuntu | Install elastichoney dependencies
-  apt: name={{item}} state=present update_cache=yes cache_valid_time=3600
+  apt: name={{ item }} state=present update_cache=yes cache_valid_time=3600
   with_items:
     - git
     - golang
@@ -25,12 +26,12 @@
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 - name: yum | Install elastichoney dependencies
-  yum: name={{item}} state=present update_cache=yes
+  yum: name={{ item }} state=present update_cache=yes
   with_items:
     - git
     - supervisor
     - golang-bin
-  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+  when: ansible_os_family == "RedHat"
 
 - stat: path=/opt/elastichoney
   register: elastichoneydir
@@ -65,4 +66,3 @@
 
 - name: add elastichoney logrotate.d configuration
   copy: src=logrotate-elastichoney dest=/etc/logrotate.d/elastichoney mode=0644 backup=yes
-

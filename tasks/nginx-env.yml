@@ -18,5 +18,4 @@
     nginxconf: /etc/nginx/nginx.conf
     nginxdefault: /etc/nginx/nginx.conf
     nginxsslconf:
-  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
-
+  when: ansible_os_family == "RedHat"

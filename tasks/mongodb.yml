@@ -33,14 +33,12 @@
   when: ansible_os_family == "RedHat"
 
 - name: apt | Install mongodb
-  apt: name={{item}} state=present update_cache=yes cache_valid_time=3600
+  apt: name={{ mhn_mongodb_pkg }} state=present update_cache=yes cache_valid_time=3600
   with_items: "{{ mhn_mongodb_pkg }}"
   when: ansible_os_family == 'Debian'
 
 - name: yum | Install mongodb
-  yum: name={{item}} state=present update_cache=yes
-  with_items:
-    - mongodb-org
+  yum: name=mongodb-org state=present update_cache=yes
   when: ansible_os_family == "RedHat"
   register: rpminstall
 
@@ -81,7 +79,10 @@
   systemd:
     daemon_reload: yes
     name: "{{ mongodb_svc }}"
-  when: (ansible_os_family == 'RedHat' and ansible_distribution_version.split(".")[0] == '7') and rpminstall.changed and not (ansible_virtualization_type is defined and (ansible_virtualization_type == "docker"))
+  when: >
+    (ansible_os_family == 'RedHat' and ansible_distribution_version.split(".")[0] == '7') and
+    rpminstall.changed and
+    not (ansible_virtualization_type is defined and (ansible_virtualization_type == "docker"))
 
 - name: enable service mongodb
   service: name={{ mongodb_svc }} enabled=yes state=started

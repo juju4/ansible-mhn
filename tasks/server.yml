@@ -11,7 +11,7 @@
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 - include: redhat.yml
-  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+  when: ansible_os_family == "RedHat"
 
 ## server part
 
@@ -22,6 +22,7 @@
   git:
     repo: "{{ mhn_gitrepo }}"
     dest: "{{ MHN_HOME }}"
+    version: "{{ mhn_version | default('0b701c61c50af2c6b02f412b26957cd39320eb6c') }}"
   when: not mhnrepo.stat.exists
   become: yes
   become_user: "{{ mhn_user }}"
@@ -116,4 +117,3 @@
 
 - name: ensure supervisor service is enabled
   service: name={{ supervisor_service }} enabled=yes
-

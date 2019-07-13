@@ -6,13 +6,14 @@
 
 - name: nginx restart
   service: name=nginx state=restarted
+
 - name: restart ssh
   service: name=ssh state=restarted
 
 - name: restart logstash
   service: name=logstash state=restarted
 #  delegate_to: "{{ mhn_elk_logstashserver }}"
+
 - name: restart elasticsearch
   service: name=elasticsearch state=restarted
   delegate_to: "{{ mhn_elk_elasticserver }}"
-

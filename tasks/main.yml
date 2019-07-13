@@ -11,7 +11,7 @@
   when: ansible_distribution == 'Ubuntu'
 - name: Include version-specific variables for RedHat
   include_vars: "RedHat-{{ ansible_distribution_version.split('.')[0] }}.yml"
-  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+  when: ansible_os_family == "RedHat"
 
 - name: Install MHN Server
   include: server.yml
@@ -23,5 +23,7 @@
 
 - name: Reboot the server
   command: /sbin/reboot
-  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and file.stat.exists == true and (noreboot is not defined and not noreboot)
-
+  when: >
+    (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and
+    file.stat.exists and
+    (noreboot is not defined and not noreboot)

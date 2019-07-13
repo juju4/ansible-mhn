@@ -1,22 +1,27 @@
 ---
+
 ## small hack to avoid registering multiple times
-- stat: path="/root/.registration_done-{{ honeypot }}"
+- name: Check if existing registration token
+  stat:
+    path: "/root/.registration_done-{{ honeypot }}"
   register: done
 
 - name: Ubuntu | Install dependencies
-  apt: name={{item}} state=present update_cache=yes cache_valid_time=3600
-  with_items:
-    - curl
+  apt: name=curl state=present update_cache=yes cache_valid_time=3600
   when: not done.stat.exists or done.stat.size == 0
 
-- shell: "curl {{ curl_arg }} -s -X POST -H \"Content-Type: application/json\" -d '{ \"name\": \"{{ ansible_hostname }}-{{ honeypot }}\", \"hostname\": \"{{ ansible_hostname }}\",  \"deploy_key\": \"{{ deploy_key }}\", \"honeypot\": \"{{ honeypot }}\" }' {{ server_url }}/api/sensor/ > /root/.registration_done-{{ honeypot }}"
+- name: Get MHN registration token for service
+  shell: "curl {{ curl_arg }} -s -X POST -H \"Content-Type: application/json\" -d '{ \"name\": \"{{ ansible_hostname }}-{{ honeypot }}\", \"hostname\": \"{{ ansible_hostname }}\",  \"deploy_key\": \"{{ deploy_key }}\", \"honeypot\": \"{{ honeypot }}\" }' {{ server_url }}/api/sensor/ > /root/.registration_done-{{ honeypot }}"
   when: not done.stat.exists or done.stat.size == 0
 
-- command: "python -c 'import json;obj=json.load(file(\"/root/.registration_done-{{ honeypot }}\"));print obj[\"uuid\"]'"
+- name: Retrieve existing registration token
+  command: "python -c 'import json;obj=json.load(file(\"/root/.registration_done-{{ honeypot }}\"));print obj[\"uuid\"]'"
   register: uuid
   failed_when: uuid.stdout == ''
   when: not done.stat.exists or done.stat.size == 0
 
-- file: path="/root/.registration_done-{{ honeypot }}" state=touch
+- name: Ensure registration token marker
+  file:
+    path: "/root/.registration_done-{{ honeypot }}"
+    state: touch
   when: not done.stat.exists or done.stat.size == 0
-

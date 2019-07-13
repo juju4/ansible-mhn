@@ -1,4 +1,5 @@
 ---
+
 - name: MHN Client | registration
   include: registration.yml honeypot=glastopf
 - set_fact:
@@ -17,7 +18,7 @@
   changed_when: False
 
 - name: Ubuntu | Install glastopf dependencies
-  apt: name={{item}} state=present update_cache=yes cache_valid_time=3600
+  apt: name={{ item }} state=present update_cache=yes cache_valid_time=3600
   with_items:
     - python2.7
     - python-openssl
@@ -47,7 +48,7 @@
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 - name: yum | Install glastopf dependencies
-  yum: name={{item}} state=present update_cache=yes
+  yum: name={{ item }} state=present update_cache=yes
   with_items:
     - git
     - supervisor
@@ -72,13 +73,16 @@
     - libxslt-devel
 ## FIXME! rpm missing?
 #    - python-openssl
-  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+  when: ansible_os_family == "RedHat"
 
 ## Note: may conflict w release for other modules: contop, snort
 - stat: path=/usr/local/lib/python2.7/dist-packages/distribute-0.6.35-py2.7.egg
   register: distribute
 - name: download distribute python
-  get_url: url=https://pypi.python.org/packages/source/d/distribute/distribute-0.6.35.tar.gz dest=/tmp/distribute-0.6.35.tar.gz mode=0440
+  get_url:
+    url: https://pypi.python.org/packages/source/d/distribute/distribute-0.6.35.tar.gz
+    dest: /tmp/distribute-0.6.35.tar.gz
+    mode: '0440'
   when: not distribute.stat.exists
 - command: "tar xzf /tmp/distribute-0.6.35.tar.gz -C /tmp/"
   when: not distribute.stat.exists
@@ -96,7 +100,9 @@
   when: not bfrdir.stat.exists
 - stat: path=/opt/BFR/modules/bfr.so
   register: bfrinstall
-- command: "{{ item }} chdir=/opt/BFR"
+- command: "{{ item }}"
+  args:
+    chdir: /opt/BFR
   with_items:
     - phpize
     - "./configure --enable-bfr"
@@ -107,7 +113,10 @@
 - shell: "find /usr/lib/php5/ -type f -name bfr.so | awk -F'/' '{print $5}'"
   register: BFR_BUILD_OUTPUT
 
-- lineinfile: "dest=/etc/php5/apache2/php.ini regexp='^zend_extension = /usr/lib/php5/{{ BFR_BUILD_OUTPUT.stdout }}/bfr.so' line='zend_extension = /usr/lib/php5/{{ BFR_BUILD_OUTPUT.stdout }}/bfr.so'"
+- lineinfile:
+    dest: /etc/php5/apache2/php.ini
+    regexp: '^zend_extension = .*'
+    line: "zend_extension = /usr/lib/php5/{{ BFR_BUILD_OUTPUT.stdout }}/bfr.so"
 
 - service: name=apache2 state=stopped enabled=no
 
@@ -123,4 +132,3 @@
   template: "src=glastopf.conf dest={{ supervisor_confdir }}/glastopf.{{ supervisor_ext }} mode=0644"
   notify:
     - supervisor update
-

@@ -1,13 +1,14 @@
 ---
 
 - name: Install mhnserver dependencies
-  package: name={{item}} state=present
-  with_items: "{{ mhnserver_pkg }}"
+  package: name={{ mhnserver_pkg }} state=present
 
 ## FIXME! xenial: https://github.com/unbit/uwsgi/issues/1262
 - name: Ubuntu 16.04+ | fix bug uwsgi
   replace: dest={{ MHN_HOME }}/server/requirements.txt regexp='^uWSGI.*' replace='uWSGI'
-  when: ansible_distribution == 'Ubuntu' and (ansible_distribution_release == 'xenial' or ansible_distribution_release == 'bionic')
+  when: >
+    ansible_distribution == 'Ubuntu' and
+    (ansible_distribution_release == 'xenial' or ansible_distribution_release == 'bionic')
 
 # https://stackoverflow.com/questions/49627807/cryptacular-is-broken
 # default is bcrypt 2.0.0 vs last 3.1.4/oct 2017
@@ -36,7 +37,7 @@
 - name: RedHat | Install mhnserver virtualenv pysqlite
   pip: name=pysqlite version=2.8.1
     virtualenv={{ MHN_HOME }}/env
-  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+  when: ansible_os_family == "RedHat"
 
 - name: Install python config
   pip:
@@ -101,7 +102,7 @@
           template: src=default dest={{ nginx_sitedir }}/mhn.conf mode=0644
           notify:
             - nginx restart
-      when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+      when: ansible_os_family == "RedHat"
   when: mhn_httpport is defined
 
 - block:
@@ -134,7 +135,7 @@
           template: src=default-ssl dest={{ nginx_sitedir }}/mhn-ssl.conf mode=0644
           notify:
             - nginx restart
-      when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+      when: ansible_os_family == "RedHat"
   when: mhn_httpsport is defined
 
 - name: set mhnserver supervisor config
@@ -152,7 +153,11 @@
     MHN_UUID: "{{ 100 | random }}"
   when: not addusercollector.stat.exists
 - name: generate random secret
-  shell: "openssl rand -base64 48 | sed 's@[=\\/\\+]@@g;'"
+  shell: |
+    set -o pipefail
+    openssl rand -base64 48 | sed 's@[=\\/\\+]@@g;'
+  args:
+    executable: /bin/bash
   changed_when: false
   register: rand
 - set_fact:
@@ -202,5 +207,3 @@
 - name: MHN Server | ensure services are enabled and started
   service: name={{ item }} enabled=yes state=started
   with_items: "{{ mhnserver_services }}"
-
-

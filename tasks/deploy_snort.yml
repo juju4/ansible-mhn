@@ -1,4 +1,5 @@
 ---
+
 - name: MHN Client | registration
   include: registration.yml honeypot=snort
 - set_fact:
@@ -20,7 +21,7 @@
   changed_when: False
 
 - name: Ubuntu | Install snort dependencies
-  apt: name={{item}} state=present update_cache=yes cache_valid_time=3600
+  apt: name={{ item }} state=present update_cache=yes cache_valid_time=3600
   with_items:
     - git
     - supervisor
@@ -44,7 +45,7 @@
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 - name: yum | Install snort dependencies
-  yum: name={{item}} state=present update_cache=yes
+  yum: name={{ item }} state=present update_cache=yes
   with_items:
     - git
     - supervisor
@@ -64,7 +65,7 @@
 ## FIXME! missing rpm
 #    - libdumbnet-dev
 #    - libdaq-dev
-  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+  when: ansible_os_family == "RedHat"
 
 ## former is needed if older release present (conpot)
 #- command: "pip install --upgrade distribute"
@@ -174,4 +175,3 @@
 ## FIXME! not idempotent, way to do if file /opt/mhn/rules/mhn.rules older than 3600s ?
 - name: MHN client | snort - update rules
   command: /etc/cron.daily/update_snort_rules.sh
-

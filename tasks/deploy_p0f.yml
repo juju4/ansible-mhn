@@ -1,4 +1,5 @@
 ---
+
 - name: MHN Client | registration
   include: registration.yml honeypot=p0f
 - set_fact:
@@ -17,7 +18,7 @@
   changed_when: False
 
 - name: Ubuntu | Install p0f dependencies
-  apt: name={{item}} state=present update_cache=yes cache_valid_time=3600
+  apt: name={{ item }} state=present update_cache=yes cache_valid_time=3600
   with_items:
     - git
     - supervisor
@@ -27,7 +28,7 @@
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 - name: yum | Install p0f dependencies
-  yum: name={{item}} state=present update_cache=yes
+  yum: name={{ item }} state=present update_cache=yes
   with_items:
     - git
     - supervisor
@@ -35,7 +36,7 @@
     - libpcap-devel
     - jansson-devel
     - "@Development tools"
-  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+  when: ansible_os_family == "RedHat"
 
 - stat: path=/opt/p0f
   register: p0fdir
@@ -60,4 +61,3 @@
   template: "src=p0f.conf dest={{ supervisor_confdir }}/p0f.{{ supervisor_ext }} mode=0644"
   notify:
     - supervisor update
-

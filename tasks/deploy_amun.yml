@@ -1,4 +1,5 @@
 ---
+
 - name: MHN Client | registration
   include: registration.yml honeypot=amun
 - set_fact:
@@ -16,23 +17,18 @@
   register: HPF_SECRET
   changed_when: False
 
-- name: Ubuntu | Install amun dependencies
-  apt: name={{item}} state=present update_cache=yes cache_valid_time=3600
-  with_items:
-    - git
-    - supervisor
-    - python-pip
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+- name: Install amun dependencies
+  package:
+    name:
+      - git
+      - supervisor
+      - python-pip
+    state: present
+    update_cache: yes
+    cache_valid_time: 3600
 
-- name: yum | Install amun dependencies
-  yum: name={{item}} state=present update_cache=yes
-  with_items:
-    - git
-    - supervisor
-    - python-pip
-  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
-
-- stat: path=/opt/amun
+- name: Check if amun root dir exists
+  stat: path=/opt/amun
   register: amundir
 - name: git clone amun
   git:
@@ -41,24 +37,27 @@
     version=development
   when: not amundir.stat.exists
 
-- replace: "dest=/opt/amun/conf/amun.conf regexp='{{ item.regexp }}' replace='{{ item.replace }}' backup=yes"
+- name: Update Amun configuration
+  replace: "dest=/opt/amun/conf/amun.conf regexp='{{ item.regexp }}' replace='{{ item.replace }}' backup=yes"
   with_items:
     - { regexp: 'ip: 127.0.0.1', replace: 'ip: 0.0.0.0' }
     - { regexp: '    vuln-http,', replace: "#   vuln-http," }
     - { regexp: 'log_modules:', replace: "log_modules:\\\n    log-hpfeeds" }
 
-- file: path=/opt/amun/hexdumps state=directory mode=0755
+- name: Ensure Amun hexdumps directory exists
+  file: path=/opt/amun/hexdumps state=directory mode=0755
 
-- shell: "{{ item }}"
+- name: Update proc and ulimit for Amun
+  shell: "{{ item }}"
   with_items:
     - 'echo "104854" > /proc/sys/fs/file-max'
     - 'ulimit -Hn 104854'
     - 'ulimit -n 104854'
 
-- template: src=log-hpfeeds.conf dest=/opt/amun/conf/log-hpfeeds.conf mode=0644
+- name: Set Amun hpfeeds logs
+  template: src=log-hpfeeds.conf dest=/opt/amun/conf/log-hpfeeds.conf mode=0644
 
 - name: set amun supervisor config
   template: "src=amun.conf dest={{ supervisor_confdir }}/amun.{{ supervisor_ext }} mode=0644"
   notify:
     - supervisor update
-

@@ -1,7 +1,7 @@
 ---
 
 - name: Ubuntu | Install hpfeeds-logger-arcsight dependencies
-  apt: name={{item}} state=present update_cache=yes cache_valid_time=3600
+  apt: name={{ item }} state=present update_cache=yes cache_valid_time=3600
   with_items:
     - git
     - python-pip
@@ -12,14 +12,14 @@
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 - name: yum | Install hpfeeds-logger-arcsight dependencies
-  yum: name={{item}} state=present update_cache=yes
+  yum: name={{ item }} state=present update_cache=yes
   with_items:
     - git
     - python-pip
     - python-virtualenv
     - supervisor
     - GeoIP-devel
-  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+  when: ansible_os_family == "RedHat"
 
 - include: hpfeeds-logger.yml
 
@@ -54,5 +54,3 @@
   template: src=hpfeeds-logger-arcsight.conf dest=/etc/supervisor/conf.d/hpfeeds-logger-arcsight.conf mode=0644
   notify:
     - supervisor update
-
-
