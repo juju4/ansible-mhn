@@ -100,10 +100,8 @@
   file: path=/var/log/mhn state=directory mode=755
 
 - name: Install hpfeeds virtualenv packages
-  pip: name={{item}} state=present
+  pip: name=GeoIP state=present
     virtualenv=/opt/hpfeeds/env
-  with_items:
-    - GeoIP
 
 ## use maxmind roles to get db in /var/maxmind
 #- file: src={{ item }} dest=/opt/ state=link

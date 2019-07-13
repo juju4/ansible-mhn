@@ -5,10 +5,14 @@
     - name: Apt | Add Mongodb repository key
       apt_key: keyserver=hkp://keyserver.ubuntu.com:80 id=0C49F3730359A14518585931BC711F9BA15703C6
     - name: Debian | Add Mongodb repository
-      apt_repository: repo='deb http://repo.mongodb.org/apt/{{ ansible_distribution|lower }} {{ ansible_distribution_release }}/mongodb-org/3.4 main' state=present
+      apt_repository:
+        repo: 'deb http://repo.mongodb.org/apt/{{ ansible_distribution|lower }} {{ ansible_distribution_release }}/mongodb-org/3.4 main'
+        state: present
       when: ansible_distribution == 'Debian'
     - name: Ubuntu | Add Mongodb repository
-      apt_repository: repo='deb http://repo.mongodb.org/apt/{{ ansible_distribution|lower }} {{ ansible_distribution_release }}/mongodb-org/3.4 multiverse' state=present
+      apt_repository:
+        repo: 'deb http://repo.mongodb.org/apt/{{ ansible_distribution|lower }} {{ ansible_distribution_release }}/mongodb-org/3.4 multiverse'
+        state: present
       when: ansible_distribution == 'Ubuntu' and ansible_distribution_release != 'bionic'
     - block:
         - name: ensure systemd config directory exists

@@ -4,7 +4,7 @@
 #- include: root-password-expired.yml
 
 - include: set-proxy.yml
-  when: mhn_webproxy != ''
+  when: mhn_webproxy
 
 - name: Include version-specific variables for Ubuntu.
   include_vars: "{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml"

@@ -71,7 +71,7 @@
 - include: arcsight.yml
   when: mhn_do_arcsight is defined and mhn_do_arcsight
 - include: elk.yml
-  when: mhn_do_elk is defined and mhn_do_elk and mhn_elk_elasticserver != ''
+  when: mhn_do_elk is defined and mhn_do_elk and mhn_elk_elasticserver
 
 - block:
     - file: dest=/etc/aide/aide.conf.d state=directory mode=0755

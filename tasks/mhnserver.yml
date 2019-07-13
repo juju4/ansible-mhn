@@ -53,7 +53,11 @@
   register: config_done
 - name: Initialize configuration. Please be patient. This can take several minutes
 ## will do nothing if config.py exists
-  command: "{{ MHN_HOME }}/env/bin/python generateconfig.py unattended -e {{ MHN_EMAIL }} -p {{ MHN_PASS }} -b {{ server_url }} -y {{ honeymap_url }} -l {{ MHN_HOME }}/server/mhn.log"
+  command: >
+    {{ MHN_HOME }}/env/bin/python generateconfig.py unattended
+        -e {{ MHN_EMAIL }} -p {{ MHN_PASS }}
+        -b {{ server_url }} -y {{ honeymap_url }}
+        -l {{ MHN_HOME }}/server/mhn.log"
   args:
     chdir: "{{ MHN_HOME }}/server"
   when: not config_done.stat.exists or not init_done.stat.exists
@@ -111,7 +115,11 @@
       register: localsslcert
 
     - name: Generale SSL certificate
-      command: openssl req -x509 -nodes -sha256 -days 1095 -newkey rsa:2048 -subj "{{ certinfo }}/CN={{ certificate_cn }}" -keyout {{ ssl_private }}/{{ ansible_fqdn }}.key -out {{ ssl_cert }}/{{ ansible_fqdn }}.crt
+      command: >
+        openssl req -x509 -nodes -sha256 -days 1095 -newkey rsa:2048
+                -subj "{{ certinfo }}/CN={{ certificate_cn }}"
+                -keyout {{ ssl_private }}/{{ ansible_fqdn }}.key
+                -out {{ ssl_cert }}/{{ ansible_fqdn }}.crt
       when: not localsslcert.stat.exists
     - name: ensure key file permissions are correct
       file: path={{ ssl_private }}/{{ ansible_fqdn }}.key owner=root group={{ ssl_group }} mode=0440
