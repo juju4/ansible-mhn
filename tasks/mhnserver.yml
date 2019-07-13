@@ -57,7 +57,7 @@
     {{ MHN_HOME }}/env/bin/python generateconfig.py unattended
         -e {{ MHN_EMAIL }} -p {{ MHN_PASS }}
         -b {{ server_url }} -y {{ honeymap_url }}
-        -l {{ MHN_HOME }}/server/mhn.log"
+        -l {{ MHN_HOME }}/server/mhn.log
   args:
     chdir: "{{ MHN_HOME }}/server"
   when: not config_done.stat.exists or not init_done.stat.exists
