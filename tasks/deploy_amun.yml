@@ -5,17 +5,26 @@
 - set_fact:
     deploy: /root/.registration_done-amun
 
-- shell: "echo {{ server_url }} | sed 's#^http://##; s#^https://##; s#/.*$##; s/:.*$//'"
+- name: Extract HPF_HOST from server_url
+  shell: >
+    set -o pipefail
+    echo {{ server_url }} | sed 's#^http://##; s#^https://##; s#/.*$##; s/:.*$//'
+  args:
+    executable: /bin/bash
   register: HPF_HOST
   changed_when: False
-- set_fact:
+- name: Set fact HPF_PORT
+  set_fact:
     HPF_PORT: 10000
-- shell: "python -c 'import json;obj=json.load(file(\"{{ deploy }}\"));print obj[\"identifier\"]'"
+- name: Recover HPF_IDENT
+  shell: "python -c 'import json;obj=json.load(file(\"{{ deploy }}\"));print obj[\"identifier\"]'"
   register: HPF_IDENT
   changed_when: False
-- shell: "python -c 'import json;obj=json.load(file(\"{{ deploy }}\"));print obj[\"secret\"]'"
+- name: Recover HPF_SECRET
+  shell: "python -c 'import json;obj=json.load(file(\"{{ deploy }}\"));print obj[\"secret\"]'"
   register: HPF_SECRET
   changed_when: False
+  no_log: true
 
 - name: Install amun dependencies
   package:
@@ -47,10 +56,12 @@
 - name: Ensure Amun hexdumps directory exists
   file: path=/opt/amun/hexdumps state=directory mode=0755
 
-- name: Update proc and ulimit for Amun
-  shell: "{{ item }}"
+- name: Update proc for Amun
+  shell: 'echo "104854" > /proc/sys/fs/file-max'
+
+- name: Update ulimit for Amun
+  command: "{{ item }}"
   with_items:
-    - 'echo "104854" > /proc/sys/fs/file-max'
     - 'ulimit -Hn 104854'
     - 'ulimit -n 104854'
 

@@ -5,20 +5,26 @@
 - set_fact:
     deploy: /root/.registration_done-snort
 
-- shell: "echo {{ server_url }} | sed 's#^http://##; s#^https://##; s#/.*$##; s/:.*$//'"
+- name: Extract HPF_HOST from server_url
+  shell: >
+    set -o pipefail
+    echo {{ server_url }} | sed 's#^http://##; s#^https://##; s#/.*$##; s/:.*$//'
+  args:
+    executable: /bin/bash
   register: HPF_HOST
   changed_when: False
-- set_fact:
+- name: Set fact HPF_PORT
+  set_fact:
     HPF_PORT: 10000
-- shell: "python -c 'import json;obj=json.load(file(\"{{ deploy }}\"));print obj[\"identifier\"]'"
+- name: Recover HPF_IDENT
+  shell: "python -c 'import json;obj=json.load(file(\"{{ deploy }}\"));print obj[\"identifier\"]'"
   register: HPF_IDENT
   changed_when: False
-- shell: "python -c 'import json;obj=json.load(file(\"{{ deploy }}\"));print obj[\"secret\"]'"
+- name: Recover HPF_SECRET
+  shell: "python -c 'import json;obj=json.load(file(\"{{ deploy }}\"));print obj[\"secret\"]'"
   register: HPF_SECRET
   changed_when: False
-- shell: "ifconfig {{ if_snort }} | awk -F'[ :]' '/inet addr/ {print $13}'"
-  register: ipaddr
-  changed_when: False
+  no_log: true
 
 - name: Ubuntu | Install snort dependencies
   apt: name={{ item }} state=present update_cache=yes cache_valid_time=3600
@@ -120,15 +126,17 @@
 
 - stat: path=/opt/snort/etc/snort.conf
   register: snortconf
-- command: "rsync -ci /opt/snortrepo/etc/{{ item }} /opt/snort/etc/{{ item }}"
+- name: Use snortrepo config
+  copy:
+   src: "/opt/snortrepo/etc/{{ item }}"
+   dest: "/opt/snort/etc/{{ item }}"
+   mode: '0644'
   with_items:
     - snort.conf
     - classification.config
     - reference.config
     - threshold.conf
     - unicode.map
-  register: rsync_result
-  changed_when: 'rsync_result.stdout != ""'
   when: not snortconf.stat.exists
 - name: MHN client | snort - validate configuration permissions
   file: "dest=/opt/snort/etc/{{ item }} mode=0644"
@@ -139,7 +147,8 @@
     - threshold.conf
     - unicode.map
 
-- stat: path=/opt/snort/rules/white_list.rules
+- name: Check if /opt/snort/rules/white_list.rules exists
+  stat: path=/opt/snort/rules/white_list.rules
   register: wrules
 - name: MHN client | snort - touch black/white list rules files
   file: "path=/opt/snort/rules/{{ item }} state=touch"
@@ -162,7 +171,8 @@
     - { regexp: '^output log_hpfeeds', line: "output log_hpfeeds: host {{ HPF_HOST.stdout }}, ident {{ HPF_IDENT.stdout }}, secret {{ HPF_SECRET.stdout }}, channel snort.alerts, port {{ HPF_PORT }}" }
   when: HPF_SECRET is defined
 
-- file: src=/opt/mhn/rules/mhn.rules path=/opt/snort/rules/local.rules state=link force=yes
+- name: Symlink mhn rules for snort
+  file: src=/opt/mhn/rules/mhn.rules path=/opt/snort/rules/local.rules state=link force=yes
 
 - name: MHN client | snort - supervisor config
   template: "src=snort.conf dest={{ supervisor_confdir }}/snort.{{ supervisor_ext }} mode=0644"
