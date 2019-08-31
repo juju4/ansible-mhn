@@ -24,7 +24,7 @@
   replace:
     dest: "{{ MHN_HOME }}/server/requirements.txt"
     regexp: '^redis==.*'
-    replace: 'redis==3.2.1'
+    replace: 'redis==3.3.8'
 
 #- name: Install mhnserver virtualenv pycparser BUG https://github.com/pyca/cryptography/issues/3187
 #  pip: name=pycparser version=2.14
