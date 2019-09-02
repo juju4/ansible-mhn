@@ -51,34 +51,33 @@
 - name: check if mhn configuration file exists
   stat: path={{ MHN_HOME }}/server/config.py
   register: config_done
-- name: Initialize configuration. Please be patient. This can take several minutes
-## will do nothing if config.py exists
-  command: >
-    {{ MHN_HOME }}/env/bin/python generateconfig.py unattended
-        -e {{ MHN_EMAIL }} -p {{ MHN_PASS }}
-        -b {{ server_url }} -y {{ honeymap_url }}
-        -l {{ MHN_HOME }}/server/mhn.log
-  args:
-    chdir: "{{ MHN_HOME }}/server"
-  when: not config_done.stat.exists or not init_done.stat.exists
-- name: Initialize database. Please be patient. This can take several minutes
-## out an error if database already initialized
-  command: "{{ MHN_HOME }}/env/bin/python initdatabase.py"
-  args:
-    chdir: "{{ MHN_HOME }}/server"
-  when: not config_done.stat.exists or not init_done.stat.exists
-  register: initdb
-  async: 900
-  poll: 0
-- name: check db initialization status
-  async_status:
-    jid: "{{ initdb.ansible_job_id }}"
-  register: job_result
-  until: job_result.finished
-  retries: 30
-  delay: 30
-- name: add marker for db as initialized
-  file: path={{ MHN_HOME }}/.configdb_initialized state=touch
+- block:
+    - name: Initialize configuration. Please be patient. This can take several minutes
+    ## will do nothing if config.py exists
+      command: >
+        {{ MHN_HOME }}/env/bin/python generateconfig.py unattended
+            -e {{ MHN_EMAIL }} -p {{ MHN_PASS }}
+            -b {{ server_url }} -y {{ honeymap_url }}
+            -l {{ MHN_HOME }}/server/mhn.log
+      args:
+        chdir: "{{ MHN_HOME }}/server"
+    - name: Initialize database. Please be patient. This can take several minutes
+    ## out an error if database already initialized
+      command: "{{ MHN_HOME }}/env/bin/python initdatabase.py"
+      args:
+        chdir: "{{ MHN_HOME }}/server"
+      register: initdb
+      async: 900
+      poll: 0
+    - name: check db initialization status
+      async_status:
+        jid: "{{ initdb.ansible_job_id }}"
+      register: job_result
+      until: job_result.finished
+      retries: 30
+      delay: 30
+    - name: add marker for db as initialized
+      file: path={{ MHN_HOME }}/.configdb_initialized state=touch
   when: not config_done.stat.exists or not init_done.stat.exists
 
 
