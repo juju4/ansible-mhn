@@ -11,5 +11,4 @@
     - geerlingguy.elasticsearch
     - geerlingguy.logstash
     - geerlingguy.kibana
-    - juju4.maxmind
     - juju4.mhn

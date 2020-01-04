@@ -118,6 +118,7 @@
 #    - GeoLiteCity
     - GeoLiteCityv6
 #    - GeoIPASNum
+  when: mhn_maxminddb_present
 
 - stat: path={{ MHN_HOME }}/.addusergeoloc
   register: addusergeoloc
