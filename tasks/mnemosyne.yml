@@ -43,7 +43,7 @@
 
 - name: Python2 EOL - Force setuptools 44
   pip:
-    name: python
+    name: setuptools
     version: 44.0.0
     virtualenv: /opt/mnemosyne/env
 
