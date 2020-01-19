@@ -41,6 +41,12 @@
 - name: fix PROTOCOL_SSLv3 error in gevent
   replace: dest=/opt/mnemosyne/requirements.txt regexp='^gevent==.*' replace='gevent>=1.0.2'
 
+- name: Python2 EOL - Force setuptools 44
+  pip:
+    name: python
+    version: 44.0.0
+    virtualenv: /opt/mnemosyne/env
+
 ## FIXME! seems to be run/changed each time?
 ## https://github.com/ansible/ansible/issues/6191
 - name: Install mnemosyne virtualenv
