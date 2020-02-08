@@ -20,11 +20,22 @@
     backup: yes
   when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'bionic'
 
-- name: update pip requirements.txt for redis
+- name: update pip requirements.txt
   replace:
     dest: "{{ MHN_HOME }}/server/requirements.txt"
-    regexp: '^redis==.*'
-    replace: 'redis==3.3.8'
+    regexp: "{{ item.re }}"
+    replace: "{{ item.rep }}"
+  with_items:
+    - { re: '^redis==.*', rep: 'redis==3.3.8' }
+    - { re: '^Flask-WTF==.*', rep: 'Flask-WTF==0.14.3' }
+
+- name: add pip requirements.txt
+  lineinfile:
+    dest: "{{ MHN_HOME }}/server/requirements.txt"
+    regexp: "{{ item.re }}"
+    line: "{{ item.l }}"
+  with_items:
+    - { re: '^Werkzeug==.*', l: 'Werkzeug==0.16.1' }
 
 #- name: Install mhnserver virtualenv pycparser BUG https://github.com/pyca/cryptography/issues/3187
 #  pip: name=pycparser version=2.14
