@@ -1,0 +1,23 @@
+---
+# https://github.com/pwnlandia/mhn/issues/738
+# https://github.com/pwnlandia/geolite2
+
+- name: Get Maxmind mmdb from pwnlandia/geolite2
+  get_url:
+    url: "https://github.com/pwnlandia/geolite2/raw/master/{{ item }}"
+    dest: "{{ mhn_userdir }}/{{ item }}"
+    mode: '0644'
+  with_items:
+    - GeoLite2-ASN.tar.gz
+    - GeoLite2-City.tar.gz
+    - GeoLite2-Country.tar.gz
+
+- name: Unarchive Maxmind mmdb
+  unarchive:
+    src: "{{ mhn_userdir }}/{{ item }}.tar.gz"
+    dest: "{{ mhn_userdir }}"
+    mode: '0644'
+  with_items:
+    - GeoLite2-ASN
+    - GeoLite2-City
+    - GeoLite2-Country
