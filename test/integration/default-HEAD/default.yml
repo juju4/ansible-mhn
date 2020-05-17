@@ -1,0 +1,10 @@
+---
+
+- hosts: all
+  vars:
+    - MHN_EMAIL: root@localhost
+    - MHN_PASS: root@localhost
+    - mhn_no_log: false
+    - mhn_version: HEAD
+  roles:
+    - juju4.mhn
