@@ -14,6 +14,9 @@ env:
   - distribution: ubuntu
     version: 18.04
     suite: default-logger-json
+  - distribution: ubuntu
+    version: 18.04
+    suite: default-HEAD
 
 before_install:
   - env
