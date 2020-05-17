@@ -22,7 +22,7 @@
   git:
     repo: "{{ mhn_gitrepo }}"
     dest: "{{ MHN_HOME }}"
-    version: "{{ mhn_version | default('0b701c61c50af2c6b02f412b26957cd39320eb6c') }}"
+    version: "{{ mhn_version | default('1f9bd2c9cf5da4edeb1acf0dc87aecb53dfc83da') }}"
   when: not mhnrepo.stat.exists
   become: yes
   become_user: "{{ mhn_user }}"
