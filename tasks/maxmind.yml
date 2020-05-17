@@ -21,3 +21,13 @@
     - GeoLite2-ASN
     - GeoLite2-City
     - GeoLite2-Country
+
+- name: Symlink Maxmind mmdb
+  file:
+    src: "{{ mhn_userdir }}/{{ item }}_{{ maxmind_time | default('20200114') }}/{{ item }}.mmdb"
+    dest: "{{ mhn_userdir }}/{{ item }}.mmdb"
+    state: link
+  with_items:
+    - GeoLite2-ASN
+    - GeoLite2-City
+    - GeoLite2-Country
