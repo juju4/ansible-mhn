@@ -16,7 +16,7 @@
   unarchive:
     src: "{{ mhn_userdir }}/{{ item }}.tar.gz"
     dest: "{{ mhn_userdir }}"
-    mode: '0644'
+    mode: '0755'
   with_items:
     - GeoLite2-ASN
     - GeoLite2-City
