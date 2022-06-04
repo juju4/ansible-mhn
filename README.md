@@ -1,3 +1,6 @@
+[![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/)
+# DEPRECATED/LOOKING FOR MAINTAINERS -> archived
+
 [![Build Status - Master](https://travis-ci.org/juju4/ansible-mhn.svg?branch=master)](https://travis-ci.org/juju4/ansible-mhn)
 [![Build Status - Devel](https://travis-ci.org/juju4/ansible-mhn.svg?branch=devel)](https://travis-ci.org/juju4/ansible-mhn/branches)
 # MHN Server ansible role
